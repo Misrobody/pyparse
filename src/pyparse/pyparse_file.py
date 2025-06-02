@@ -19,12 +19,13 @@ if __name__ == "__main__":
     print("\n[INFO] Operation definitions dict")   
     #dump_default_dict(ops_dict)
         
-    calls = collect_calls(source_file)
+    #calls = collect_calls(source_file)
+    calls = depth_first_search(source_file)
     print("\n[INFO] Calls")
-    #dump_list(calls)   
-      
+    #dump_list(calls) 
+         
     print("\n[INFO] Resolve callees")
-    resolve_callees(calls, ops_dict)
+    callees(calls, ops_dict)
     dump_list(calls) 
     
 

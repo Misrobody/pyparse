@@ -36,6 +36,9 @@ def export_call_table(calls):
     export_target(headers, uncompressed, "calltable")
     
 def export_not_found(calls):
-    headers = ["Calls to operations that could not be found:"]
+    headers = ["callerfilename",
+               "callermodule",
+               "callerfunction",
+               "calleefunction"]
     uncompressed = [call.export_not_found() for call in calls]
     export_target(headers, uncompressed, "notfound")

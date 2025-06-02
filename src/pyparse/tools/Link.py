@@ -16,19 +16,19 @@ class Link:
     
     def export(self):
         if self.callee == None:
-            return (self.caller.module,
-                    "<no module>",
+            return (self.caller.path,
+                    self.caller.module,
                     self.caller.name, 
                     "<unknown>", 
                     "<unknown>", 
                     "<unknown>")
-        return (self.caller.module, 
-                "<no module>",
+        return (self.caller.path, 
+                self.caller.module,
                 self.caller.name,
+                self.callee.path,
                 self.callee.module,
-                "<no module>",
                 self.callee.name)
         
     def export_not_found(self):
-        return self.caller.module + ":" + self.caller.name + " --> " + self.caller.name
+        return (self.caller.module, self.caller.name, self.caller.name, self.caller.name)
         

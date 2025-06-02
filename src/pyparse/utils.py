@@ -46,3 +46,24 @@ Check if call name is a method
 '''
 def is_method_call(name):
     return "self" in name or "super" in name
+
+def gen_empty(some_generator):
+    _exhausted  = object()
+    return next(some_generator, _exhausted) is _exhausted      
+
+def depth_first_dump(path):  
+    def _walk_dump(node, level=0):
+        if gen_empty(ast.iter_child_nodes(node)):
+            return
+        
+        padding = " " * 4 * level
+        if isinstance(node, ast.Call):          
+            print(colored(padding + str(node), "red"))
+        else:
+            print(padding + str(node))
+        
+        for child in ast.iter_child_nodes(node):
+            _walk_dump(child, level+1)
+            
+    tree = get_ast(path)
+    _walk_dump(tree)

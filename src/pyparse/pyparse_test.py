@@ -20,16 +20,17 @@ if __name__ == "__main__":
     print("[INFO] Operation definitions dict")   
     #dump_default_dict(ops_dict)
         
-    calls = call_table(source_dir)
+    calls = call_table_test(source_dir)
     print("[INFO] Calls")
-    #dump_list(calls)   
+    #dump_list(calls)
     
     
     print("[INFO] Resolve callees")
-    resolved = resolve_callees(calls, ops_dict)
-    #dump_list(calls)
+    resolved = callees(calls, ops_dict)
+    dump_list(calls)
     print("[INFO] Resolved " + str(resolved) + " out of " + str(len(calls)) + " callees")
     
+    '''
     print("[INFO] Export operation_definitions.csv")
     export_operation_list(ops)
     print("[INFO] Exported operation_definitions.csv")
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     print("[INFO] Export notfound.csv")
     export_not_found(calls)
     print("[INFO] Exported notfound.csv")  
-    
+    '''
     
 
     
