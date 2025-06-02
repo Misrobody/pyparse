@@ -1,17 +1,13 @@
 import ast
 
 class Operation:
-    def __init__(self, path, module, name):    
-        # path representing the module
+    def __init__(self, path, module, name):
         self.path = path
-        # module name
-        self.module = module    
-        # caller operation name
+        self.module = module
         self.name = name
-        
+
     def __repr__(self):
-        return "(" + self.module.__repr__() + ", " + self.name + ")"
-    
+        return f"({repr(self.module)}, {self.name})"
+
     def export(self):
-        return (self.module, self.name)
-    
+        return self.module, self.name

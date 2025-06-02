@@ -2,6 +2,7 @@ from operation_definitions import *
 from params import *
 from call_table import *
 from utils import *
+from imports import *
             
 if __name__ == "__main__":      
     arg_check_dir()
@@ -24,11 +25,10 @@ if __name__ == "__main__":
     print("[INFO] Calls")
     #dump_list(calls)   
     
-    
-    print("[INFO] Resolve callees")
-    resolved = resolve_callees(calls, ops_dict)
+    print("[INFO] Resolve callees from internal operation definitions")
+    nb_resolved_int = resolve_callees(calls, ops_dict)
     #dump_list(calls)
-    print("[INFO] Resolved " + str(resolved) + " out of " + str(len(calls)) + " callees")
+    print("[INFO] Resolved " + str(nb_resolved_int) + " out of " + str(len(calls)) + " callees")
     
     print("[INFO] Export operation_definitions.csv")
     export_operation_list(ops)
@@ -41,6 +41,7 @@ if __name__ == "__main__":
     print("[INFO] Export notfound.csv")
     export_not_found(calls)
     print("[INFO] Exported notfound.csv")  
+    
     
     
 
