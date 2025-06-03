@@ -15,4 +15,7 @@ class OperationCall:
                 self.callee.name)
         
     def export_not_found(self):
-        return (self.caller.module, self.caller.name, self.callee.module, self.callee.name)
+        return (self.caller.path, self.caller.module, self.caller.name, self.callee.name)
+    
+    def is_resolved(self):
+        return self.callee.module == "<unknown>" and self.callee.path == "<unknown>"

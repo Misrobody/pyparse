@@ -52,5 +52,6 @@ def export_not_found(calls):
                "callermodule",
                "callerfunction",
                "calleefunction"]
-    uncompressed = [call.export_not_found() for call in calls]
+    uncompressed = [call.export_not_found() for call in calls if call.is_resolved()]
+    uncompressed = list(set(uncompressed))
     export_target(headers, uncompressed, "notfound")

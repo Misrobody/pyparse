@@ -11,7 +11,7 @@ def collect_methods(path, tree):
     methods = []
     current_class = tree.name
     for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef):
+        if isinstance(node, ast.FunctionDef) and is_method(node):
             operation = Operation(path, file_name(path), current_class + "." + node.name)
             methods.append(operation) 
     return methods

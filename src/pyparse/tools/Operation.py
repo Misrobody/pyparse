@@ -1,4 +1,5 @@
 import ast
+from termcolor import colored
 
 class Operation:
     def __init__(self, path, module, name):
@@ -7,7 +8,10 @@ class Operation:
         self.name = name
 
     def __repr__(self):
-        return f"({repr(self.module)}, {self.name})"
+        res = f"({repr(self.module)}, {self.name})"
+        if self.module == "<unknown>":
+            return colored(res, "red")
+        return res
 
     def export(self):
         return self.module, self.name

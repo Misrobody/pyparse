@@ -48,6 +48,15 @@ Check if call name is a method
 def is_method_call(name):
     return "self" in name or "super" in name
 
+'''
+Check if an AST FunctionDef node is a static method
+'''
+def is_static_method(node):   
+    return any(
+        isinstance(decorator, ast.Name) and decorator.id == "staticmethod"
+        for decorator in node.decorator_list
+    )
+    
 def gen_empty(some_generator):
     _exhausted  = object()
     return next(some_generator, _exhausted) is _exhausted      
@@ -58,7 +67,7 @@ def depth_first_dump(path):
             return
         
         padding = " " * 4 * level
-        if isinstance(node, ast.Call):          
+        if isinstance(node, ast.FunctionDef):          
             print(colored(padding + str(node), "red"))
         else:
             print(padding + str(node))
