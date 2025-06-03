@@ -9,8 +9,10 @@ class Operation:
 
     def __repr__(self):
         res = f"({repr(self.module)}, {self.name})"
-        if self.module == "<unknown>":
+        if self.module == "<unknown>" and self.path == "<unknown>":
             return colored(res, "red")
+        elif self.path == "<import>":
+            return colored(res, "yellow")
         return res
 
     def export(self):

@@ -52,6 +52,16 @@ def export_not_found(calls):
                "callermodule",
                "callerfunction",
                "calleefunction"]
-    uncompressed = [call.export_not_found() for call in calls if call.is_resolved()]
+    uncompressed = [call.export_not_found() for call in calls if call.is_unresolved()]
     uncompressed = list(set(uncompressed))
     export_target(headers, uncompressed, "notfound")
+    
+def export_all(ops_dict, calls):
+    export_operation_dict(ops_dict)
+    print("[INFO] Exported operation_definitions.csv")
+    
+    export_call_table(calls)
+    print("[INFO] Exported operation_definitions.csv")  
+    
+    export_not_found(calls)
+    print("[INFO] Exported notfound.csv") 
