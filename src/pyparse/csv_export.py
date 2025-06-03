@@ -23,6 +23,18 @@ def export_operation_list(operations):
     export_target(headers, uncompressed, "operation_definitions")
     
 '''
+Export a given operation dict as csv
+'''
+def export_operation_dict(ops_dict):
+    headers = ["file", "operation"]
+    uncompressed = []
+    for ops in ops_dict.values():
+        for op in ops:
+            uncompressed.append(op.export())
+    export_target(headers, uncompressed, "operation_definitions")
+      
+
+'''
 Export a given call table as csv
 '''
 def export_call_table(calls):

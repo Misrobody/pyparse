@@ -23,14 +23,6 @@ def depth_first_search(path):
     _walk_search(get_ast(path), 0)
     return calls
 
-def call_table(source_dir):
-    all_calls = []
-    for root, _, files in os.walk(source_dir):
-        for file in files:
-            if file.endswith(".py"):
-                all_calls.extend(depth_first_search(os.path.join(root, file)))
-    return all_calls
-
 def resolve_callees(call_table, operation_dict):
     count = 0
     for opcall in call_table:

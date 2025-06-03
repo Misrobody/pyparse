@@ -15,4 +15,4 @@ class OperationCall:
                 self.callee.name)
         
     def export_not_found(self):
-        return (self.caller.module, self.caller.name, self.caller.name, self.caller.name)
+        return (self.caller.module, self.caller.name, self.callee.module, self.callee.name)

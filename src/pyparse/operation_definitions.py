@@ -50,17 +50,6 @@ def collect_operations(path):
         method_ops += collect_methods(path, c)
     return function_ops + method_ops + class_ops
 
-'''
-Collect operation definitions in a given directory
-'''
-def operation_list(source_dir): 
-    all_operations = []  
-    for root, _, files in os.walk(source_dir):
-        for file in files:
-            if file.endswith(".py"):
-                source_file = os.path.join(root, file)
-                all_operations += collect_operations(source_file)                      
-    return all_operations
 
 '''
 Build an efficient data struct for operation research

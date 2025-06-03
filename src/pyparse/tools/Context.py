@@ -57,3 +57,6 @@ class Context:
         caller = Operation(self.filepath, file_name(self.filepath), self.get(call_level))
         callee = Operation("<unknown>", "<unknown>", self.get_name(call))
         return OperationCall(caller, callee)
+    
+    def build_operation(self, cur_level):
+        return Operation(self.filepath, file_name(self.filepath), self.get(cur_level))
