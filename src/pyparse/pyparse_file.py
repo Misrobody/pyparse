@@ -1,7 +1,6 @@
 from params import *
 from call_table import *
 from utils import *
-from operation_definitions import *
 from termcolor import colored
             
 if __name__ == "__main__":      
@@ -9,7 +8,6 @@ if __name__ == "__main__":
     source_file = get_source_file()
     print("\n[INFO] Source file: ", source_file)
      
-    
 
     ops_dict, calls = depth_first_search(source_file)  
 
