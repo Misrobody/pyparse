@@ -8,6 +8,7 @@ class CallResolver:
                 
         default_imports = list(sys.stdlib_module_names)
         default_imports.remove("this")
+        default_imports.remove("antigravity")
         self.all_imports = list(set(default_imports) | set(imports))
         self.imported_modules = self._list_imported_modules()
         
