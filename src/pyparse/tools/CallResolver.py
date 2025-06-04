@@ -1,40 +1,30 @@
 import importlib, builtins, sys
+from utils import *
 
 class CallResolver:
-    def __init__(self, calls):
+    def __init__(self, ops_dict, calls, imports):
+        self.ops_dict = ops_dict
         self.calls = calls
+                
+        default_imports = list(sys.stdlib_module_names)
+        default_imports.remove("this")
+        self.all_imports = list(set(default_imports) | set(imports))
+        self.imported_modules = self._list_imported_modules()
+        
         self.callees = 0
         self.modules = 0
         self.methods = 0
-
-    def _resolve_callees(self, operation_dict): 
-        for opcall in self.calls:
-            if opcall.callee.name in operation_dict:
-                opcall.callee = operation_dict[opcall.callee.name][0]
-                self.callees +=1
-            elif opcall.callee.name.split(".")[-1] in operation_dict:
-                opcall.callee = operation_dict[opcall.callee.name.split(".")[-1]][0]
-                self.callees +=1
-   
-    def _resolve_modules(self, imports):
-        for module_name in imports:       
+                              
+    def _list_imported_modules(self):
+        imported_modules = []
+        for module_name in self.all_imports:       
             try:
-                module = importlib.import_module(module_name)
+                module = importlib.import_module(module_name)  
+                imported_modules.append(module)             
             except ModuleNotFoundError:
-                continue       
-            for opcall in self.calls:
-                if hasattr(module, opcall.callee.name.split(".")[-1]) and opcall.is_unresolved():
-                    opcall.callee.module = module_name
-                    opcall.callee.path = "<import>"
-                    self.modules +=1
-
-    def _resolve_default_methods(self):
-        for opcall in self.calls:
-            if self._find_method_in_builtin(opcall.callee.name.split(".")[-1]):
-                opcall.callee.module = "builtins"
-                opcall.callee.path = "<import>"
-                self.methods += 1
-    
+                continue  
+        return imported_modules
+                
     def _find_method_in_builtin(self, method_name):
         builtin_types = [name for name in dir(builtins) if isinstance(getattr(builtins, name), type)]   
         for t in builtin_types:
@@ -44,24 +34,32 @@ class CallResolver:
                     return True
             except (TypeError, RuntimeError):
                 pass  # Skip types that require arguments or cause instantiation errors   
-        return False
+        return False   
 
-    def resolve_all(self, ops_dict, imports, builtin=False, external=False):      
-        self._resolve_callees(ops_dict)
-        
-        # Search in the default Python library
-        if external:
-            default_imports = list(sys.stdlib_module_names)
-            default_imports.remove("this")
-            self._resolve_modules(default_imports)
-            self._resolve_default_methods()
-        
-        # Search in the modules imported from the app
-        if builtin:
-            self._resolve_modules(imports)   
-                                
+    def resolve_all(self):       
+        for opcall in self.calls:
+            if opcall.callee.name in self.ops_dict:
+                opcall.callee = self.ops_dict[opcall.callee.name][0]
+                self.callees +=1
+
+            elif opcall.root() in self.ops_dict:
+                opcall.callee = self.ops_dict[opcall.root()][0]
+                self.callees +=1
+                
+            elif self._find_method_in_builtin(opcall.root()):
+                opcall.callee.module = "builtins"
+                opcall.callee.path = "<import-method>"
+                self.methods += 1
+            
+            else:
+                for m in self.imported_modules:
+                    if hasattr(m, opcall.root()):
+                        opcall.callee.module = m.__name__
+                        opcall.callee.path = "<import>"
+                        self.modules +=1 
+                        break
         return self.calls
-    
+           
     def stats(self):
         stats = {}
         stats["total"] = len(self.calls)

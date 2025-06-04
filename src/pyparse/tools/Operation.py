@@ -13,6 +13,8 @@ class Operation:
             return colored(res, "red")
         elif self.path == "<import>":
             return colored(res, "yellow")
+        elif self.path == "<import-method>":
+            return colored(res, "blue")
         return res
 
     def export(self):

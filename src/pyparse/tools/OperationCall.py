@@ -19,3 +19,6 @@ class OperationCall:
     
     def is_unresolved(self):
         return self.callee.module == "<unknown>" or self.callee.path == "<unknown>"
+    
+    def root(self):
+        return self.callee.name.split(".")[-1]

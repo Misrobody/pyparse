@@ -7,7 +7,7 @@ if __name__ == "__main__":
     source_dir = args.source_dir()
     target_dir = args.target_dir()
     
-    analysis = Analysis(source_dir, target_dir, builtin=True, external=True)
+    analysis = Analysis(source_dir, target_dir)
     analysis.run()
     analysis.export()
     analysis.print_stats()
