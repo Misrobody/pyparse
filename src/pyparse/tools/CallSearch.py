@@ -1,6 +1,6 @@
 import ast
 from utils import *
-from tools.Context import Context
+from tools.CallContext import CallContext
 
 class CallSearch:
     def __init__(self, source_dir):
@@ -28,7 +28,7 @@ class CallSearch:
         calls = []
         operations = []
         imports = []
-        context = Context(path)
+        context = CallContext(path)
 
         def _walk_search(node, level):
             if gen_empty(ast.iter_child_nodes(node)):
