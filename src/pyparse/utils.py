@@ -1,5 +1,6 @@
 import sys, ast, os
 from termcolor import colored
+from collections import defaultdict
 
 def get_ast(file):   
     with open(file, "r") as file:
@@ -77,3 +78,9 @@ def depth_first_dump(path):
             
     tree = get_ast(path)
     _walk_dump(tree)
+    
+def operation_dict(op_list):
+    dict = defaultdict(list)
+    for op in op_list:
+        dict[op.name].append(op)
+    return dict

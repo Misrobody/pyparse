@@ -1,7 +1,6 @@
 import ast
 from utils import *
 from tools.Context import *
-from collections import defaultdict
 import importlib
 
 def go_over(source_dir):   
@@ -19,12 +18,6 @@ def go_over(source_dir):
                 all_imports += imports
                                                    
     return operation_dict(all_operations), all_calls, list(set(all_imports))
-
-def operation_dict(op_list):
-    dict = defaultdict(list)
-    for op in op_list:
-        dict[op.name].append(op)
-    return dict
 
 def depth_first_search(path):
     calls = []
@@ -53,27 +46,3 @@ def depth_first_search(path):
 
     _walk_search(get_ast(path), 0)
     return operations, calls, imports
-
-def resolve_callees(call_table, operation_dict):
-    count = 0
-    for opcall in call_table:
-        if opcall.callee.name in operation_dict:
-            opcall.callee = operation_dict[opcall.callee.name][0]
-            count += 1
-    return count
-  
-def resolve_modules(call_table, imports):
-    count = 0
-    for module_name in imports:       
-        try:
-            module = importlib.import_module(module_name)
-        except ModuleNotFoundError:
-            continue       
-        for opcall in call_table:
-            if hasattr(module, opcall.callee.name) and opcall.is_resolved():
-                opcall.callee.module = module_name
-                count +=1
-    return count
-
-    
-

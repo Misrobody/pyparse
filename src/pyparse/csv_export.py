@@ -1,5 +1,6 @@
 import csv, sys, os
 from params import *
+from utils import *
       
 def export(headers, data, target_dir, filename): 
     if not os.path.isdir(target_dir):
@@ -14,17 +15,11 @@ def export(headers, data, target_dir, filename):
 def export_target(headers, data, filename): 
     export(headers, data, get_target_dir(), filename)
         
-'''
-Export a given operation list as csv
-'''
 def export_operation_list(operations):
     headers = ["file", "operation"]
     uncompressed = [op.export() for op in operations]
     export_target(headers, uncompressed, "operation_definitions")
     
-'''
-Export a given operation dict as csv
-'''
 def export_operation_dict(ops_dict):
     headers = ["file", "operation"]
     uncompressed = []
@@ -33,10 +28,6 @@ def export_operation_dict(ops_dict):
             uncompressed.append(op.export())
     export_target(headers, uncompressed, "operation_definitions")
       
-
-'''
-Export a given call table as csv
-'''
 def export_call_table(calls):
     headers = ["callerfilename",
                "callermodule",
