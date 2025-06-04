@@ -1,6 +1,6 @@
 import ast
 from utils import *
-from tools.Context import *
+from tools.Context import Context
 
 class CallSearch:
     def __init__(self, source_dir):

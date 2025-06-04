@@ -26,28 +26,11 @@ def dump_default_dict(ddict):
     for el in ddict:
         print(f"{el:<{max_length}} : {ddict[el]!r}")
         
-   
-'''
-Return class nodes for a given ast
-'''     
-def collect_classes(tree):
-    classes = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            classes.append(node)    
-    return classes
-
 '''
 Check if ast node is a method
 '''
 def is_method(node):
     return node.args.args and node.args.args[0].arg == "self"
-
-'''
-Check if call name is a method
-'''
-def is_method_call(name):
-    return "self" in name or "super" in name
 
 '''
 Check if an AST FunctionDef node is a static method

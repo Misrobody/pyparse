@@ -1,5 +1,5 @@
-from tools.Operation import *
-from tools.OperationCall import *
+from tools.Operation import Operation 
+from tools.OperationCall import OperationCall
 from utils import *
 
 class Context:

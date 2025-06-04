@@ -1,13 +1,13 @@
-from params import *
-from tools.Analysis import *
+from tools.CommandArgs import CommandArgs
+from tools.Analysis import Analysis
              
-if __name__ == "__main__":      
-    arg_check_dir()
-    source_dir = get_source_dir()
-    target_dir = get_target_dir()
-    print("[INFO] Source directory: ", source_dir)
-
-    analysis = Analysis(source_dir, builtin=True, external=True)
+if __name__ == "__main__": 
+    args = CommandArgs()
+    args.check()
+    source_dir = args.source_dir()
+    target_dir = args.target_dir()
+    
+    analysis = Analysis(source_dir, target_dir, builtin=True, external=True)
     analysis.run()
     analysis.export()
     analysis.print_stats()

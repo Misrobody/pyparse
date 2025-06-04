@@ -1,11 +1,10 @@
-from params import *
-from tools.CallSearch import *
 from utils import *
-from tools.CsvExporter import *
-from tools.CallResolver import *
+from tools.CallSearch import CallSearch
+from tools.CsvExporter import CsvExporter
+from tools.CallResolver import CallResolver
 
 class Analysis:
-    def __init__(self, source_dir, builtin=False, external=False):
+    def __init__(self, source_dir, target_dir, builtin=False, external=False):
         self.source_dir = source_dir       
         self.builtin = builtin
         self.external = external
@@ -13,7 +12,7 @@ class Analysis:
         self.ops_dict = {}
         self.calls = []
         self.imports = []
-        self.exporter = CsvExporter()
+        self.exporter = CsvExporter(target_dir)
                              
     def run(self):
         searcher = CallSearch(self.source_dir)

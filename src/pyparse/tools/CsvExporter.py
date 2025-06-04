@@ -1,10 +1,9 @@
 import csv, sys, os
-from params import *
 from utils import *
 
 class CsvExporter:
-    def __init__(self):
-        self.target = get_target_dir()
+    def __init__(self, target_dir):
+        self.target = target_dir
               
     def export_target(self, headers, data, filename): 
         if not os.path.isdir(self.target):
