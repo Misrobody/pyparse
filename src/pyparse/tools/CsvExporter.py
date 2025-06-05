@@ -41,8 +41,8 @@ class CsvExporter:
         uncompressed = [call.export_not_found() for call in calls if call.is_unresolved()]
         uncompressed = list(set(uncompressed))
         self.export_target(headers, uncompressed, "notfound")
-        
-    def export_all(self, ops_dict, calls):
-        self._export_operation_dict(ops_dict)      
-        self._export_call_table(calls)      
-        self._export_not_found(calls)
+              
+    def export_calls(self, call_resolver):
+        self._export_operation_dict(call_resolver.resolved_ops())      
+        self._export_call_table(call_resolver.resolved_calls())      
+        self._export_not_found(call_resolver.resolved_calls())

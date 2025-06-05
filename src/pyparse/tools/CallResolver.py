@@ -1,20 +1,26 @@
 import importlib, builtins, sys
 from utils import *
 
-class CallResolver:
-    def __init__(self, ops_dict, calls, imports):
-        self.ops_dict = ops_dict
-        self.calls = calls
+class CallResolver:  
+    def __init__(self, callsearcher):
+        self.ops_dict = callsearcher.ops()
+        self.calls = callsearcher.calls()
                 
         default_imports = list(sys.stdlib_module_names)
         default_imports.remove("this")
         default_imports.remove("antigravity")
-        self.all_imports = list(set(default_imports) | set(imports))
+        self.all_imports = list(set(default_imports) | set(callsearcher.imports()))
         self.imported_modules = self._list_imported_modules()
         
         self.callees = 0
         self.modules = 0
         self.methods = 0
+             
+    def resolved_calls(self):
+        return self.calls
+    
+    def resolved_ops(self):
+        return self.ops_dict
                               
     def _list_imported_modules(self):
         imported_modules = []
@@ -59,7 +65,6 @@ class CallResolver:
                         opcall.callee.path = "<import>"
                         self.modules +=1 
                         break
-        return self.calls
            
     def stats(self):
         stats = {}

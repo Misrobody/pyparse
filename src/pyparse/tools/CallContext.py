@@ -17,16 +17,7 @@ class CallContext(Context):
     def resolve_operation_name(self):
         if is_method(self.func_node) or is_static_method(self.func_node):
             return f"{self.class_node.name}.{self.func_node.name}"
-        return self.func_node.name
-
-    def resolve_callee_name(self, call):
-        name = self.resolve_name(call)
-            
-        if "self" in name:
-            name = name.replace("self", self.class_node.name)
-        elif "super" in name and self.class_node.bases:
-            name = name.replace("super", self.resolve_name(self.class_node.bases[0]))
-        return name      
+        return self.func_node.name   
         
     def build_call(self, call, call_level):
         caller = Operation(self.filepath, file_name(self.filepath), self.resolve_caller_name(call_level))

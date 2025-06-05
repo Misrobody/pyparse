@@ -41,10 +41,6 @@ def is_static_method(node):
         for decorator in node.decorator_list
     )
     
-def gen_empty(some_generator):
-    _exhausted  = object()
-    return next(some_generator, _exhausted) is _exhausted      
-
 def depth_first_dump(path):  
     def _walk_dump(node, level=0):
         if gen_empty(ast.iter_child_nodes(node)):

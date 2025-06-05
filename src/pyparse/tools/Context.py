@@ -12,13 +12,15 @@ class Context:
         self.func_node = None
         self.func_level = 0
         self.class_node = None
+        self.class_level = 0
 
     def update_func(self, func_node, level):
         self.func_node = func_node
         self.func_level = level
 
-    def update_class(self, class_node):
+    def update_class(self, class_node, class_level):
         self.class_node = class_node
+        self.class_level = class_level
 
     def resolve_name(self, node):
         '''Resolve a multipart name (hello.world)'''
@@ -30,3 +32,12 @@ class Context:
         if isinstance(node, ast.Name):
             name_parts.append(node.id)   
         return ".".join(reversed(name_parts))
+    
+    def resolve_callee_name(self, call):
+        name = self.resolve_name(call)
+            
+        if "self" in name:
+            name = name.replace("self", self.class_node.name)
+        elif "super" in name and self.class_node.bases:
+            name = name.replace("super", self.resolve_name(self.class_node.bases[0]))
+        return name
