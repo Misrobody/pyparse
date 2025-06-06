@@ -1,5 +1,5 @@
 from utils import *
-from tools.Operation import *
+from generic.Operation import *
 
 '''
 A class which tracks the context in a depth-first walk in an ast.
@@ -22,18 +22,6 @@ class Context:
     def update_class(self, class_node, class_level):
         self.class_node = class_node
         self.class_level = class_level
-
-    '''
-    def resolve_name(self, node):
-        name_parts = [] 
-        while isinstance(node, (ast.Attribute, ast.Call)):
-            if isinstance(node, ast.Attribute):
-                name_parts.append(node.attr)
-            node = node.value if isinstance(node, ast.Attribute) else node.func    
-        if isinstance(node, ast.Name):
-            name_parts.append(node.id)   
-        return ".".join(reversed(name_parts))
-    '''
     
     def resolve_name(self, node):
         name_parts = [] 

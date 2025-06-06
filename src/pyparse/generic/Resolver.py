@@ -11,12 +11,18 @@ class Resolver:
         default_imports.remove("antigravity")
         self.all_imports = list(set(default_imports) | set(searcher.imports()))
         self.imported_modules = self._list_imported_modules()
+        
+        self.stats = {}
+        self.stats["total"] = len(self.calls)
              
     def resolved_calls(self):
         return self.calls
     
     def resolved_ops(self):
         return self.ops_dict
+    
+    def get_stats(self):
+        return self.stats
                               
     def _list_imported_modules(self):
         imported_modules = []

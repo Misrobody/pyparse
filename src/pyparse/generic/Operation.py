@@ -23,3 +23,6 @@ class Operation:
 
     def export(self):
         return self.module, self.name
+    
+    def root(self):
+        return self.name.split(".")[-1]

@@ -11,11 +11,13 @@ class CommonBlock:
         self.vars.append(caller)
         
     def __repr__(self):
-        res = self.name + " \n\tvars:\n"
-        
+        res = self.name + " \n\tvars:\n"      
         for v in self.vars:
-            res += "\t" + str(v) + "\n"
-            
+            res += "\t" + str(v) + "\n"           
         if not self.files and not self.modules and not self.vars:
             return colored(res, "red")
         return res
+    
+    def export(self):
+        return (self.name, self.files.__repr__(), self.modules.__repr__(), self.vars.__repr__())
+    

@@ -1,9 +1,10 @@
-from tools.Operation import *
-from tools.DataCall import *
-from tools.Context import *
-from tools.CommonBlock import *
-from utils import *
 import ast
+
+from generic.Operation import *
+from generic.Context import *
+
+from dataflow.DataCall import *
+from dataflow.CommonBlock import *
 
 class DataflowContext(Context):
     def __init__(self, filepath):

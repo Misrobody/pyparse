@@ -42,7 +42,46 @@ class CsvExporter:
         uncompressed = list(set(uncompressed))
         self.export_target(headers, uncompressed, "notfound")
               
-    def export_calls(self, call_resolver):
-        self._export_operation_dict(call_resolver.resolved_ops())      
-        self._export_call_table(call_resolver.resolved_calls())      
-        self._export_not_found(call_resolver.resolved_calls())
+    def _export_common_blocks(self, blocks):
+        headers = ["name",
+                "files",
+                "modules",
+                "variables"]
+        uncompressed = [block.export() for block in blocks]
+        self.export_target(headers, uncompressed, "common-blocks")
+              
+    def _export_dataflow_cc(self, calls):
+        headers = ["source-path",
+                "source-module",
+                "source-operation",
+                "target-path",
+                "target-module",
+                "target-operation",
+                "direction"]
+        uncompressed = [call.export() for call in calls]
+        self.export_target(headers, uncompressed, "dataflow-cc")
+    
+    def _export_dataflow_cb(self, calls, blocks):
+        headers = ["common-block",
+                "file",
+                "module",
+                "operation",
+                "direction"]
+        uncompressed = [block.export() for block in blocks]
+        self.export_target(headers, uncompressed, "dataflow-cb")
+              
+    def export_calls(self, resolver):
+        self._export_operation_dict(resolver.resolved_ops())      
+        self._export_call_table(resolver.resolved_calls())      
+        self._export_not_found(resolver.resolved_calls())
+        
+    def export_dataflow(self, resolver):
+        calls = resolver.resolved_calls()
+        blocks = resolver.resolved_common_blocks()
+        
+        self._export_operation_dict(resolver.resolved_ops())
+        self._export_not_found(calls)
+        self._export_common_blocks(blocks)
+        self._export_dataflow_cc(calls)
+        #self._export_dataflow_cb(calls, blocks)
+        

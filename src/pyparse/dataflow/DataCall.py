@@ -13,13 +13,16 @@ class DataCall:
                 self.caller.name,
                 self.callee.path,
                 self.callee.module,
-                self.callee.name)
+                self.callee.name,
+                self.direction)
         
     def export_not_found(self):
         return (self.caller.path, self.caller.module, self.caller.name, self.callee.name)
     
     def is_unresolved(self):
         return self.callee.module == "<unknown>" or self.callee.path == "<unknown>"
-    
-    def root(self):
-        return self.callee.name.split(".")[-1]
+                   
+    def set_callee(self, callee):
+        self.callee.name = callee.name
+        self.callee.module = callee.module
+        self.callee.path = callee.path

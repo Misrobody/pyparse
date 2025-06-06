@@ -1,24 +1,14 @@
 import ast, os
-from utils import *
-from tools.DataflowContext import *
-from tools.Search import *
+from generic.Search import *
+from dataflow.DataflowContext import *
 
 class DataflowSearch(Search):
     def __init__(self, source_dir):
-        self.source_dir = source_dir
-        
-        self.all_datacalls = []
+        super().__init__(source_dir)   
         self.all_common_blocks = []
-        self.all_operations = []
         
-    def datacalls(self):
-        return self.all_datacalls
-    
     def common_blocks(self):
         return self.all_common_blocks
-    
-    def ops(self):
-        return operation_dict(self.all_operations)
                                                          
     def _depth_first_search(self, path):
         context = DataflowContext(path)
@@ -37,7 +27,9 @@ class DataflowSearch(Search):
                 self.all_operations.append(context.build_class_definition())
                 self.all_common_blocks.append(context.build_common_block(node))
             elif isinstance(node, ast.Assign) or isinstance(node, ast.AnnAssign) or isinstance(node, ast.AugAssign):
-                self.all_datacalls.extend(context.build_datacall(node, level))
+                self.all_calls.extend(context.build_datacall(node, level))
+            elif isinstance(node, ast.Import):
+                self.all_imports.update(alias.name for alias in node.names)
                 
             for child in ast.iter_child_nodes(node):
                 _walk_search(child, level + 1)

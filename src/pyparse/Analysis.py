@@ -1,10 +1,12 @@
 from utils import *
-from tools.CallSearch import *
-from tools.CsvExporter import *
-from tools.CallResolver import *
-from tools.Stats import *
-from tools.DataflowSearch import *
-from tools.DataflowResolver import *
+from CsvExporter import *
+from Stats import *
+
+from call.CallSearch import *
+from call.CallResolver import *
+
+from dataflow.DataflowSearch import *
+from dataflow.DataflowResolver import *
 
 # Mode is either 'call' or 'dataflow'
 class Analysis:
@@ -24,15 +26,18 @@ class Analysis:
             raise ValueError("No such mode for analysis: " + self.mode)
                        
     def run_dataflow_analysis(self):
-       searcher = DataflowSearch(self.source_dir)
-       searcher.search()
-       #dump_list(searcher.datacalls())
-       resolver = DataflowResolver(searcher)
-       resolver.resolve_all()
+        searcher = DataflowSearch(self.source_dir)
+        searcher.search()
+        #dump_list(searcher.datacalls())
+        resolver = DataflowResolver(searcher)
+        resolver.resolve_all()
+        #dump_list(resolver.resolved_calls())
+        #print(call_dict(resolver.resolved_calls()))
 
-       dump_list(resolver.resolved_calls())
-       #dump_default_dict(resolver.resolved_ops())
-              
+        #dump_default_dict(resolver.resolved_ops())
+        self.exporter.export_dataflow(resolver)
+        self.stats.print_dataflow_stats(resolver)
+        
     def run_call_analysis(self):
         searcher = CallSearch(self.source_dir)
         searcher.search()

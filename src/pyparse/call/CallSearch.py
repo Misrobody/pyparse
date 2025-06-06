@@ -1,25 +1,12 @@
 import ast, os
 from utils import *
-from tools.CallContext import *
-from tools.Search import *
+from call.CallContext import *
+from generic.Search import *
 
 class CallSearch(Search):
     def __init__(self, source_dir):
-        self.source_dir = source_dir
-        
-        self.all_operations = []
-        self.all_calls = []
-        self.all_imports = set()
-      
-    def ops(self):
-        return operation_dict(self.all_operations)
-    
-    def calls(self):
-        return self.all_calls
-    
-    def imports(self):
-        return list(self.all_imports)
-                                                       
+        super().__init__(source_dir)
+                                                            
     def _depth_first_search(self, path):
         context = CallContext(path)
 

@@ -1,7 +1,7 @@
-from tools.Operation import Operation 
-from tools.OperationCall import OperationCall
-from tools.Context import Context
 from utils import *
+from generic.Operation import Operation 
+from generic.Context import Context
+from call.OperationCall import OperationCall
 
 class CallContext(Context):
     def __init__(self, filepath):
