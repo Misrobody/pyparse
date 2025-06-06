@@ -5,7 +5,6 @@ class DataflowResolver:
     def __init__(self, dataflow_searcher):
         self.datacalls = dataflow_searcher.datacalls()
         self.datacalls_dict = call_dict(self.datacalls)
-        #dump_default_dict(self.datacalls_dict)
         
         self.common_blocks = dataflow_searcher.common_blocks()
         self.ops_dict = dataflow_searcher.ops()
@@ -39,8 +38,7 @@ class DataflowResolver:
             elif call.root() in self.datacalls_dict:
                 call.callee = self.datacalls_dict[call.root()][0]
                 self.calls +=1            
-                
-    
+                   
     def resolve_all(self):
         self.resolve_datacalls()
                  
