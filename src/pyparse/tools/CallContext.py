@@ -13,19 +13,8 @@ class CallContext(Context):
         if self.func_node is None:
             return ""
         return self.resolve_operation_name()
-        
-    def resolve_operation_name(self):
-        if is_method(self.func_node) or is_static_method(self.func_node):
-            return f"{self.class_node.name}.{self.func_node.name}"
-        return self.func_node.name   
-        
+                
     def build_call(self, call, call_level):
         caller = Operation(self.filepath, file_name(self.filepath), self.resolve_caller_name(call_level))
         callee = Operation("<unknown>", "<unknown>", self.resolve_callee_name(call))
         return OperationCall(caller, callee)
-    
-    def build_operation_definition(self):
-        return Operation(self.filepath, file_name(self.filepath), self.resolve_operation_name())
-    
-    def build_class_definition(self):
-        return Operation(self.filepath, file_name(self.filepath), self.class_node.name)

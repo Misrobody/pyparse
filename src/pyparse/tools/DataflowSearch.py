@@ -9,13 +9,17 @@ class DataflowSearch(Search):
         
         self.all_datacalls = []
         self.all_common_blocks = []
+        self.all_operations = []
         
     def datacalls(self):
         return self.all_datacalls
     
     def common_blocks(self):
         return self.all_common_blocks
-                                                       
+    
+    def ops(self):
+        return operation_dict(self.all_operations)
+                                                         
     def _depth_first_search(self, path):
         context = DataflowContext(path)
 
@@ -27,8 +31,10 @@ class DataflowSearch(Search):
                 self.all_common_blocks.append(context.build_common_block(node))
             elif isinstance(node, ast.FunctionDef):
                 context.update_func(node, level)
+                self.all_operations.append(context.build_operation_definition())
             elif isinstance(node, ast.ClassDef):
                 context.update_class(node, level)
+                self.all_operations.append(context.build_class_definition())
                 self.all_common_blocks.append(context.build_common_block(node))
             elif isinstance(node, ast.Assign) or isinstance(node, ast.AnnAssign) or isinstance(node, ast.AugAssign):
                 self.all_datacalls.extend(context.build_datacall(node, level))
