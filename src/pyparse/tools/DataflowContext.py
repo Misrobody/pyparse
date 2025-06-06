@@ -104,7 +104,6 @@ class DataflowContext(Context):
         if isinstance(node, ast.Compare):
             left_vals = self.resolve_datacall_values(node.left)
             comparators_vals = sum([self.resolve_datacall_values(c) for c in node.comparators], [])
-            #return [node.left] + node.comparators
             return sum([left_vals + comparators_vals], [])
         if isinstance(node, ast.BoolOp):
             return sum([self.resolve_datacall_values(val) for val in node.values], [])

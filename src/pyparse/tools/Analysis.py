@@ -26,11 +26,12 @@ class Analysis:
     def run_dataflow_analysis(self):
        searcher = DataflowSearch(self.source_dir)
        searcher.search()
-       dump_list(searcher.datacalls())
-       #resolver = DataflowResolver(searcher)
-       #resolver.resolve_all()
+       #dump_list(searcher.datacalls())
+       resolver = DataflowResolver(searcher)
+       resolver.resolve_all()
 
-       #dump_list(resolver.resolved_calls())
+       dump_list(resolver.resolved_calls())
+       #dump_default_dict(resolver.resolved_ops())
               
     def run_call_analysis(self):
         searcher = CallSearch(self.source_dir)

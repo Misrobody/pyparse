@@ -63,3 +63,9 @@ def operation_dict(op_list):
     for op in op_list:
         dict[op.name].append(op)
     return dict
+
+def call_dict(datacalls):
+    dict = defaultdict(list)
+    for call in datacalls:
+        dict[call.caller.name].append(call.caller.name)
+    return dict

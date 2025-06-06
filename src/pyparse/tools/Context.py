@@ -46,8 +46,7 @@ class Context:
         if isinstance(node, ast.Name):
             name_parts.append(node.id)   
         return ".".join(reversed(name_parts))
-
-    
+  
     def resolve_callee_name(self, call):
         name = self.resolve_name(call)
             
