@@ -30,7 +30,7 @@ class Stats:
         
     def print_dataflow_stats(self, dataflow_resolver):
         stats = dataflow_resolver.get_stats()
-        stats["total_resolved"] = stats["func"] + stats["calls"]
+        stats["total_resolved"] = stats["func"] + stats["calls"] + stats["modules"] + stats["methods"]
         stats["total_unresolved"] = stats["total"] - stats["total_resolved"]
         stats["in-app"] = stats["func"] + stats["calls"]
         stats["out-app"] = 0
@@ -52,7 +52,11 @@ class Stats:
         
         print("\nIn-App Callees breakdown:")
         print(f"{'Operations:':<20}{stats['func']:>10} ({_rate('func')})")
-        print(f"{'Datacalls:':<20}{stats['calls']:>10} ({_rate('calls')})")        
+        print(f"{'Datacalls:':<20}{stats['calls']:>10} ({_rate('calls')})")  
+        
+        print("\nOut-App Callees breakdown:")
+        print(colored(f"{'Modules:':<20}{stats['modules']:>10} ({_rate('modules')})", "yellow"))
+        print(colored(f"{'Methods:':<20}{stats['methods']:>10} ({_rate('methods')})", "blue"))      
         
         print("=" * 40)
 

@@ -61,27 +61,27 @@ class CsvExporter:
         uncompressed = [call.export() for call in calls]
         self.export_target(headers, uncompressed, "dataflow-cc")
     
-    def _export_dataflow_cb(self, calls, blocks):
+    def _export_dataflow_cb(self, blocks):
         headers = ["common-block",
                 "file",
                 "module",
                 "operation",
                 "direction"]
-        uncompressed = [block.export() for block in blocks]
+        uncompressed = sum([block.export_dataflow_cb() for block in blocks], [])
         self.export_target(headers, uncompressed, "dataflow-cb")
               
     def export_calls(self, resolver):
         self._export_operation_dict(resolver.resolved_ops())      
         self._export_call_table(resolver.resolved_calls())      
-        self._export_not_found(resolver.resolved_calls())
+        #self._export_not_found(resolver.resolved_calls())
         
     def export_dataflow(self, resolver):
         calls = resolver.resolved_calls()
         blocks = resolver.resolved_common_blocks()
         
-        self._export_operation_dict(resolver.resolved_ops())
-        self._export_not_found(calls)
-        self._export_common_blocks(blocks)
+        #self._export_operation_dict(resolver.resolved_ops())
+        #self._export_not_found(calls)
         self._export_dataflow_cc(calls)
-        #self._export_dataflow_cb(calls, blocks)
+        self._export_common_blocks(blocks)
+        self._export_dataflow_cb(blocks)
         

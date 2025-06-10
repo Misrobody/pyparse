@@ -33,6 +33,7 @@ class Analysis:
         resolver.resolve_all()
         #dump_list(resolver.resolved_calls())
         #print(call_dict(resolver.resolved_calls()))
+        #dump_list(resolver.resolved_common_blocks())
 
         #dump_default_dict(resolver.resolved_ops())
         self.exporter.export_dataflow(resolver)

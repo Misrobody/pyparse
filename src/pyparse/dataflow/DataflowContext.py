@@ -46,17 +46,19 @@ class DataflowContext(Context):
 
         for name in targets:
             caller = Operation(self.filepath, file_name(self.filepath), self.resolve_callee_name(name))
+            direction = self.resolve_direction(name)
             
+            # Add call to common block if needed
             if self.common_block:
                 if datacall_level == 1:
-                    self.common_block.addCaller(caller)
+                    self.common_block.addCaller(caller, direction)
                 if datacall_level == (self.class_level + 1) or (self.class_node and self.class_node.name in caller.name):
-                    self.common_block.addCaller(caller)
+                    self.common_block.addCaller(caller, direction)
 
             for val in values:
                 if not isinstance(val, ast.Constant):
                     callee = Operation("<unknown>", "<unknown>",  self.resolve_callee_name(val))
-                    res.append(DataCall(caller, callee, self.resolve_direction(name)))
+                    res.append(DataCall(caller, callee, direction))
 
         return res   
     
