@@ -5,7 +5,7 @@ class CsvExporter:
     def __init__(self, target_dir):
         self.target = target_dir
               
-    def export_target(self, headers, data, filename): 
+    def _export_target(self, headers, data, filename): 
         if not os.path.isdir(self.target):
             os.mkdir(self.target)
         
@@ -21,7 +21,7 @@ class CsvExporter:
         for ops in ops_dict.values():
             for op in ops:
                 uncompressed.append(op.export())
-        self.export_target(headers, uncompressed, "operation_definitions")
+        self._export_target(headers, uncompressed, "operation_definitions")
         
     def _export_call_table(self, calls):
         headers = ["callerfilename",
@@ -31,7 +31,7 @@ class CsvExporter:
                 "calleemodule",
                 "calleefunction"]
         uncompressed = [call.export() for call in calls]
-        self.export_target(headers, uncompressed, "calltable")
+        self._export_target(headers, uncompressed, "calltable")
         
     def _export_not_found(self, calls):
         headers = ["callerfilename",
@@ -40,7 +40,7 @@ class CsvExporter:
                 "calleefunction"]
         uncompressed = [call.export_not_found() for call in calls if call.is_unresolved()]
         uncompressed = list(set(uncompressed))
-        self.export_target(headers, uncompressed, "notfound")
+        self._export_target(headers, uncompressed, "notfound")
               
     def _export_common_blocks(self, blocks):
         headers = ["name",
@@ -48,7 +48,7 @@ class CsvExporter:
                 "modules",
                 "variables"]
         uncompressed = [block.export() for block in blocks]
-        self.export_target(headers, uncompressed, "common-blocks")
+        self._export_target(headers, uncompressed, "common-blocks")
               
     def _export_dataflow_cc(self, calls):
         headers = ["source-path",
@@ -59,7 +59,7 @@ class CsvExporter:
                 "target-operation",
                 "direction"]
         uncompressed = [call.export() for call in calls]
-        self.export_target(headers, uncompressed, "dataflow-cc")
+        self._export_target(headers, uncompressed, "dataflow-cc")
     
     def _export_dataflow_cb(self, blocks):
         headers = ["common-block",
@@ -68,7 +68,7 @@ class CsvExporter:
                 "operation",
                 "direction"]
         uncompressed = sum([block.export_dataflow_cb() for block in blocks], [])
-        self.export_target(headers, uncompressed, "dataflow-cb")
+        self._export_target(headers, uncompressed, "dataflow-cb")
               
     def export_calls(self, resolver):
         self._export_operation_dict(resolver.resolved_ops())      
@@ -84,4 +84,5 @@ class CsvExporter:
         self._export_dataflow_cc(calls)
         self._export_common_blocks(blocks)
         self._export_dataflow_cb(blocks)
+            
         

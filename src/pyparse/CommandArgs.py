@@ -12,8 +12,8 @@ class CommandArgs():
             print(self.USAGE)
             print("<inputdir> is not a directory")
             sys.exit(1)
-        elif sys.argv[3] != "call" and sys.argv[3] != "dataflow":
-            print("<mode> is either 'dataflow' or 'call'")
+        elif sys.argv[3] != "call" and sys.argv[3] != "dataflow" and sys.argv[3] != "both":
+            print(self.USAGE)
             sys.exit(1)
         
     def _format_dirname(self, param_num):

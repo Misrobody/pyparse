@@ -1,66 +1,49 @@
 from termcolor import colored
 
-class Stats:     
-    def print_call_stats(self, call_resolver):
-        stats = call_resolver.get_stats()
-        stats["total_resolved"] = stats["callees"] + stats["modules"] + stats["methods"]
-        stats["total_unresolved"] = stats["total"] - stats["total_resolved"]
-        stats["out-app"] = stats["modules"] + stats["methods"]
+class Stats:
+    def __init__(self):
+        self.stats = {}
+        self.stats["not_found"] = 0
+        self.stats["import"] = 0
+        self.stats["method"] = 0
+        self.stats["call"] = 0
+     
+    def count_stats(self, calls):
+        for call in calls:
+            if call.callee.is_not_found():
+                self.stats["not_found"] += 1
+            elif call.callee.is_from_import():
+                self.stats["import"] += 1
+            elif call.callee.is_from_method():
+                self.stats["method"] += 1
+            else:
+                self.stats["call"] += 1
+                
+        self.stats["total"] = len(calls)
+        self.stats["found"] = self.stats["call"] + self.stats["import"] + self.stats["method"]
+        self.stats["out-app"] = self.stats["import"] + self.stats["method"]
         
-        def _rate(key):
-            return f"{(stats[key] / stats['total'] * 100):.2f}%"
-
-        print("=" * 40)
-        print(colored("Statistics Overview", "cyan", attrs=["bold"]))
-        print("=" * 40)
+    def _rate(self, key):
+            return f"{(self.stats[key] / self.stats['total'] * 100):.2f}%" 
         
-        print(f"{'Total:':<20}{stats['total']:>10}")
-        print(f"{'Resolved:':<20}{stats['total_resolved']:>10} ({_rate('total_resolved')})")
-        print(colored(f"{'Unresolved:':<20}{stats['total_unresolved']:>10} ({_rate('total_unresolved')})", "red"))
-
-        print("\nCall Categories:")
-        print(f"{'In-app callees:':<20}{stats['callees']:>10} ({_rate('callees')})")
-        print(f"{'Out-app callees:':<20}{stats['out-app']:>10} ({_rate('out-app')})")
-
-        print("\nOut-App Callees breakdown:")
-        print(colored(f"{'Modules:':<20}{stats['modules']:>10} ({_rate('modules')})", "yellow"))
-        print(colored(f"{'Methods:':<20}{stats['methods']:>10} ({_rate('methods')})", "blue"))
-
+    def _stat(self, key):
+        formatted_key = key.replace("_", " ").title() + ":"
+        return f"{formatted_key:<20}{self.stats[key]:>10} ({self._rate(key)})"
+      
+    def print_stats(self, name):     
         print("=" * 40)
-        
-    def print_dataflow_stats(self, dataflow_resolver):
-        stats = dataflow_resolver.get_stats()
-        stats["total_resolved"] = stats["func"] + stats["calls"] + stats["modules"] + stats["methods"]
-        stats["total_unresolved"] = stats["total"] - stats["total_resolved"]
-        stats["in-app"] = stats["func"] + stats["calls"]
-        stats["out-app"] = 0
- 
-        def _rate(key):
-            return f"{(stats[key] / stats['total'] * 100):.2f}%" 
-        
-        print("=" * 40)
-        print(colored("Statistics Overview", "cyan", attrs=["bold"]))
+        print(f"{name} Statistics Overview")
         print("=" * 40)
         
-        print(f"{'Total:':<20}{stats['total']:>10}")
-        print(f"{'Resolved:':<20}{stats['total_resolved']:>10} ({_rate('total_resolved')})")
-        print(colored(f"{'Unresolved:':<20}{stats['total_unresolved']:>10} ({_rate('total_unresolved')})", "red"))
+        print(self._stat("total"))
         
-        print("\nCall Categories:")
-        print(f"{'In-app callees:':<20}{stats['in-app']:>10} ({_rate('in-app')})")
-        print(f"{'Out-app callees:':<20}{stats['out-app']:>10} ({_rate('out-app')})")
+        print("")
+        print(self._stat("found"))
+        print(self._stat("not_found"))
         
-        print("\nIn-App Callees breakdown:")
-        print(f"{'Operations:':<20}{stats['func']:>10} ({_rate('func')})")
-        print(f"{'Datacalls:':<20}{stats['calls']:>10} ({_rate('calls')})")  
-        
-        print("\nOut-App Callees breakdown:")
-        print(colored(f"{'Modules:':<20}{stats['modules']:>10} ({_rate('modules')})", "yellow"))
-        print(colored(f"{'Methods:':<20}{stats['methods']:>10} ({_rate('methods')})", "blue"))      
+        print("\nFound Calls Breakdown:")
+        print(self._stat("call"))
+        print(self._stat("import"))
+        print(self._stat("method"))
         
         print("=" * 40)
-
-
-        
-
-        
