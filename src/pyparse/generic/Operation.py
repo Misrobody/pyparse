@@ -1,5 +1,6 @@
 import ast
 from termcolor import colored
+from State import *
 
 class Operation:
     def __init__(self, path, module, name):
@@ -8,16 +9,16 @@ class Operation:
         self.name = name
 
     def is_not_found(self):
-        return self.module == "<unknown>" and self.path == "<unknown>"
+        return self.module == State.UNKNOWN and self.path == State.UNKNOWN
     
     def is_from_import(self):
-        return self.path == "<import>"
+        return self.path == State.IMPORTED
         
     def is_from_method(self):
-        return self.path == "<import-method>"
+        return self.path == State.METHOD
     
     def is_unresolved(self):
-        return self.name == "<unresolved>"
+        return self.name == State.UNRESOLVED
     
     def is_empty_name(self):
         return self.name == ""

@@ -1,6 +1,7 @@
 import importlib, builtins, sys
 from utils import *
 from generic.Resolver import *
+from State import *
 
 class DataflowResolver(Resolver):  
     def __init__(self, dataflow_searcher):
@@ -32,12 +33,12 @@ class DataflowResolver(Resolver):
                 call.set_callee(self.datacalls_dict[call.callee.root()])            
             elif self._find_method_in_builtin(call.callee.root()):
                 call.callee.module = "builtins"
-                call.callee.path = "<import-method>"         
+                call.callee.path = State.METHOD         
             else:
                 for m in self.imported_modules:
                     if hasattr(m, call.callee.root()):
                         call.callee.module = m.__name__
-                        call.callee.path = "<import>"
+                        call.callee.path = State.IMPORTED
                         break
         
         

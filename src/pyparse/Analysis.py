@@ -29,9 +29,6 @@ class Analysis:
     def call_analysis(self):
         resolver = CallResolver(self.search)
         resolver.resolve_all()
-             
-        #dump_list(resolver.resolved_calls())
-        
         stats = Stats()
         stats.count_stats(resolver.resolved_calls())          
         stats.print_stats("Call")

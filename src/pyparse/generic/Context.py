@@ -6,6 +6,8 @@ from dataflow.CommonBlock import *
 
 from call.OperationCall import *
 
+from State import *
+
 class Context:
     def __init__(self):
         self.filepath = ""    
@@ -59,7 +61,7 @@ class Context:
             return res
         if isinstance(datacall.target, (ast.Subscript, ast.Name, ast.Attribute)):
             return [datacall.target]
-        return ["<unresolved>"]
+        return [State.UNRESOLVED]
 
     def resolve_direction(self, name):
         if isinstance(name.ctx, ast.Load):
@@ -72,12 +74,12 @@ class Context:
         # Handle different collection types with variable references
         if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
             if not node.elts:
-                return [ast.Constant("<empty-list/tuple/set>")]   
+                return [ast.Constant(State.EMPTY_COLLECTION)]   
             elements = sum((self.resolve_datacall_values(el) for el in node.elts), [])
             return elements
         elif isinstance(node, ast.Dict):
             if not node.keys:
-                return [ast.Constant("<empty-dict>")]       
+                return [ast.Constant(State.EMPTY_COLLECTION)]       
             keys = sum((self.resolve_datacall_values(key) for key in node.keys), [])
             values = sum((self.resolve_datacall_values(val) for val in node.values), [])
             return keys + values
@@ -99,7 +101,7 @@ class Context:
         
         # Handle lambdas
         if isinstance(node, ast.Lambda):
-            return [ast.Constant("<lambda>")]
+            return [ast.Constant(State.LAMBDA)]
                 
         # Directly return relevant AST objects
         if isinstance(node, (ast.Constant, ast.Name, ast.Attribute, ast.Call, ast.Subscript)):
@@ -121,14 +123,14 @@ class Context:
     
     def resolve_function_name(self, node):
         if node == None:
-            return "<None>"
+            return State.NONE
         if is_method(node) or is_static_method(node):
             return f"{self.class_node.name}.{node.name}"
         return node.name    
     
     def resolve_module_name(self):
         if self.class_node != None and (is_method(self.func_node) or is_static_method(self.func_node)):
-            return f"{self.modulepath}.{self.class_node.name}"
+            return f"{self.modulepath}.{file_name(self.filepath)}.{self.class_node.name}"
         return f"{self.modulepath}.{file_name(self.filepath)}"
 
     def build_datacall(self, datacall, parent):
@@ -149,7 +151,7 @@ class Context:
 
             for val in values:
                 if not isinstance(val, ast.Constant):
-                    callee = Operation("<unknown>", "<unknown>",  self.resolve_name(val))
+                    callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(val))
                     res.append(DataCall(caller, callee, direction))
 
         return res   
@@ -161,7 +163,7 @@ class Context:
     
     def build_call(self, call):
         caller = Operation(self.filepath, self.resolve_module_name(), self.resolve_function_name(self.func_node))
-        callee = Operation("<unknown>", "<unknown>", self.resolve_name(call))
+        callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call))
         return OperationCall(caller, callee)
     
     def build_operation_definition(self, node):
@@ -173,7 +175,7 @@ class Context:
     def build_import_froms(self, node):
         res = []
         for alias in node.names:
-            res.append(Operation("<import>", node.module, alias.name))
+            res.append(Operation(State.IMPORTED, node.module, alias.name))
             if alias.asname:
-                res.append(Operation("<import>", node.module, alias.asname))
+                res.append(Operation(State.IMPORTED, node.module, alias.asname))
         return res
