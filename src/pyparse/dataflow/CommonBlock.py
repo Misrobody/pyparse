@@ -12,7 +12,7 @@ class CommonBlock:
         res = self.name + " \n\tvars:\n"      
         for v in self.vars:
             res += "\t" + str(v) + "\n"           
-        if self.vars:
+        if not self.vars:
             return colored(res, "red")
         return res
     

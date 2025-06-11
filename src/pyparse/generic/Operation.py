@@ -23,7 +23,7 @@ class Operation:
         return self.name == ""
     
     def __repr__(self):
-        res = f"({repr(self.path)}, {self.name})"
+        res = f"({self.path}, {self.module}, {self.name})"
         if self.is_empty_name():
             return colored(res, "magenta")
         elif self.is_unresolved():

@@ -17,7 +17,7 @@ class Analysis:
                              
     def run(self):
         self.search.search()
-                
+ 
         if self.mode == "call":
             self.call_analysis()
         elif self.mode == "dataflow":
@@ -25,10 +25,13 @@ class Analysis:
         elif self.mode == "both":
             self.call_analysis()
             self.dataflow_analysis()
-                     
+                                 
     def call_analysis(self):
         resolver = CallResolver(self.search)
         resolver.resolve_all()
+             
+        #dump_list(resolver.resolved_calls())
+        
         stats = Stats()
         stats.count_stats(resolver.resolved_calls())          
         stats.print_stats("Call")

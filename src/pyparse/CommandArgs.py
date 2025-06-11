@@ -2,7 +2,7 @@ import sys, os
 
 class CommandArgs():
     def __init__(self):
-        self.USAGE = "usage: python main.py <inputdir> <outputdir> <mode>\nMode is either 'dataflow' or 'call'"
+        self.USAGE = "usage: python main.py <inputdir> <outputdir> <mode>\nMode is either 'dataflow', 'call' or 'both'"
 
     def check(self):
         if len(sys.argv) < 4:
