@@ -8,9 +8,10 @@ from call.CallResolver import *
 from dataflow.DataflowResolver import *
 
 class Analysis:
-    def __init__(self, source_dir, target_dir, mode):
+    def __init__(self, source_dir, target_dir, mode, external):
         self.source_dir = source_dir  
-        self.mode = mode     
+        self.mode = mode  
+        self.external = external   
 
         self.exporter = CsvExporter(target_dir)
         self.search = Search(self.source_dir)
@@ -25,10 +26,9 @@ class Analysis:
         elif self.mode == "both":
             self.call_analysis()
             self.dataflow_analysis()
-        
-                                 
+                                       
     def call_analysis(self):
-        resolver = CallResolver(self.search)
+        resolver = CallResolver(self.search, self.external)
         resolver.resolve_all()
         #dump_list(resolver.opcalls)
         
@@ -36,10 +36,9 @@ class Analysis:
         stats.count_stats(resolver.opcalls)          
         stats.print_stats("Call")
         self.exporter.export_calls(resolver)
-        
-    
+          
     def dataflow_analysis(self):
-        resolver = DataflowResolver(self.search)
+        resolver = DataflowResolver(self.search, self.external)
         resolver.resolve_all()
         #dump_list(resolver.datacalls)
         

@@ -21,7 +21,7 @@ class DataCall:
     def export_not_found(self):
         return (self.caller.path, self.caller.module, self.caller.name, self.callee.name)
     
-    def update_callee_origin(self, file, module, state=State.FOUND):
+    def update_callee_origin(self, file, module, state):
         if self.callee.state != State.FOUND:
             self.callee.path = file
             self.callee.module = module

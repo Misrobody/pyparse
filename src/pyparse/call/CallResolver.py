@@ -2,9 +2,10 @@ from State import *
 from ExternalOpsComparator import *
 
 class CallResolver():  
-    def __init__(self, searcher):
+    def __init__(self, searcher, external):
         self._searcher = searcher
         self._ext = ExternalOpsComparator(self._searcher.imports)
+        self._external = external
         
         self._ops = self._searcher.funcs
         self._ops.extend(self._searcher.import_froms)
@@ -24,7 +25,8 @@ class CallResolver():
             opcall in self._searcher.funcs
             opcall in self._searcher.classes
             opcall in self._searcher.import_froms
-            self._ext.resolve_external_call(opcall)
+            if self._external:
+                self._ext.resolve_external_call(opcall)
         
         
         

@@ -25,6 +25,8 @@ class Operation:
             color = "blue"
         elif self.state == State.FOUND:
             color = "green"
+        elif self.state == State.CLASS:
+            color = "grey"
         else:
             color = "white"
         return colored(res, color)
@@ -40,7 +42,7 @@ class Operation:
                 return self.name == other.name and self.path == other.path and self.module == other.module           
             if isinstance(other, OperationCall) or isinstance(other, DataCall):
                 if self.name == other.callee.name:
-                    other.update_callee_origin(self.path, self.module)
+                    other.update_callee_origin(self.path, self.module, State.FOUND)
             return False
         
     def __hash__(self):

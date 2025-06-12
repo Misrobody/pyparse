@@ -3,10 +3,11 @@ class State:
     IMPORTED = "++imported++"
     METHOD = "++imported-method++"
     UNRESOLVED = "++unresolved++"
-    EMPTY = ""
+    KNOWN = "++known++"
+    FOUND = "++found++"
+    CLASS = "++class++"
+    
     NONE = "++none++"
     LAMBDA = "++lambda++"
     EMPTY_COLLECTION = "++empty-collection++"
-    KNOWN = "++known++"
-    FOUND = "++found++"
-        
+    EMPTY = ""

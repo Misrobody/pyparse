@@ -5,24 +5,26 @@ class Stats:
     def __init__(self):
         self.stats = {}
         self.stats["not_found"] = 0
-        self.stats["import"] = 0
-        self.stats["method"] = 0
-        self.stats["call"] = 0
+        self.stats["imports"] = 0
+        self.stats["methods"] = 0
+        self.stats["class_definitions"] = 0
+        self.stats["generic"] = 0
      
     def count_stats(self, calls):
         for call in calls:
             if call.callee.state == State.UNKNOWN:
                 self.stats["not_found"] += 1
             elif call.callee.state == State.IMPORTED:
-                self.stats["import"] += 1
+                self.stats["imports"] += 1
             elif call.callee.state == State.METHOD:
-                self.stats["method"] += 1
+                self.stats["methods"] += 1
+            elif call.callee.state == State.CLASS:
+                self.stats["class_definitions"] += 1
             else:
-                self.stats["call"] += 1
+                self.stats["generic"] += 1
                 
         self.stats["total"] = len(calls)
-        self.stats["found"] = self.stats["call"] + self.stats["import"] + self.stats["method"]
-        self.stats["out-app"] = self.stats["import"] + self.stats["method"]
+        self.stats["found"] = self.stats["generic"] + self.stats["imports"] + self.stats["methods"] + self.stats["class_definitions"]
         
     def _rate(self, key):
             return f"{(self.stats[key] / self.stats['total'] * 100):.2f}%" 
@@ -39,12 +41,15 @@ class Stats:
         print(self._stat("total"))
         
         print("")
-        print(self._stat("found"))
-        print(self._stat("not_found"))
+        print(colored(self._stat("found"), "green"))
+        print(colored(self._stat("not_found"), "red"))
         
-        print("\nFound Calls Breakdown:")
-        print(self._stat("call"))
-        print(self._stat("import"))
-        print(self._stat("method"))
+        print("\nInternal Calls Breakdown:")
+        print(self._stat("class_definitions"))
+        print(self._stat("generic"))
         
+        print("\nExternal Calls Breakdown:")
+        print(self._stat("imports"))
+        print(self._stat("methods"))
+       
         print("=" * 40)
