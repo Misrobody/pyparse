@@ -1,6 +1,8 @@
 import os
 from utils import *
 from generic.Context import *
+from generic.ClassInfo import *
+from generic.FileInfo import *
 
 class Search:
     def __init__(self, source_dir):
@@ -9,94 +11,95 @@ class Search:
         
         self._opcalls = []
         self._datacalls = []
-        self._operations = []
+
         self._imports = set()
-        self._common_blocks = []
+        self._import_froms = []
+
         self._classes = {}
-        self._class_nodes = []
         self._funcs = []
+        self._files = []
         
-    def common_blocks(self):
-        return self._common_blocks
-    
-    def ops(self):
-        return operation_dict(self._operations)
-    
+    @property
     def opcalls(self):
-        return self._opcalls
+        return self._opcalls    
     
+    @property
     def datacalls(self):
         return self._datacalls
     
+    @property
+    def funcs(self):
+        return self._funcs
+    
+    @property
     def imports(self):
         return list(self._imports)    
     
+    @property
     def classes(self):
-        return self._classes
+        return self._classes.values()
+    
+    @property
+    def files(self):
+        return self._files
+    
+    # remove root module itself from import_froms ?
+    @property
+    def import_froms(self):
+        return self._import_froms
     
     def search(self):                
-        current_module = "" 
-        for dirpath, dirnames, filenames in os.walk(self.source_dir):         
+        current_module = ""
+        for dirpath, dirnames, filenames in os.walk(self.source_dir): 
+            
+            # resolve module name        
             if "__init__.py" in filenames:         
                 parent_dir = os.path.dirname(dirpath)
                 if parent_dir.endswith(current_module):
                     new_module = f"{current_module}/{file_name(dirpath)}"
                 else:
                     new_module = f"{longest_common_substring(current_module, parent_dir)}/{file_name(dirpath)}"
-                current_module = new_module                          
+                current_module = new_module    
+                
+            # parse files                      
             for file in filenames:              
                 if file.endswith(".py"):
-                    self._depth_first_search(os.path.join(dirpath, file), current_module.strip("/").replace("/", "."))
-        
-        # Add super methods with self prefix
-        for node in self._class_nodes:
-            if node.bases:
-                for base in node.bases:        
-                    base_name = resolve_name_utils(base).split('.')[-1]
-                    if base_name in self._classes:
-                        for base_method in self._classes[base_name]:
-                            op = Operation(base_method.path, base_method.module, f"{node.name}.{base_method.name.split('.')[-1]}")
-                            self._operations.append(op)
-                                                           
-    def _depth_first_search(self, path, modulepath):
-        def _walk_search(node, parent):
+                    fileInfo = FileInfo(dirpath, file, current_module.strip("/").replace("/", "."))
+                    self._files.append(fileInfo)
+                    self.context.update_file(fileInfo)
+                    self._depth_first_search()
+                                                                              
+    def _depth_first_search(self):
+        def _walk_search(node, parent=None):
             if not any(ast.iter_child_nodes(node)):  
                 return
-
-            if isinstance(node, ast.Module):
-                self._common_blocks.append(self.context.build_common_block(node))
-                
+                        
+            if isinstance(node, ast.ClassDef):
+                classInfo = self.context.build_class(node)
+                self.context.update_class(classInfo)
+                self._classes[node.name] = classInfo
+                           
             elif isinstance(node, ast.FunctionDef):
                 self.context.update_func(node)
-                func_def = self.context.build_operation_definition(node)
-                self._operations.append(func_def)
+                func = self.context.build_func(node)
                 if is_method(node) or is_static_method(node):
-                    if self.context.class_node != None:
-                        self._classes[self.context.class_node.name].append(func_def)
-                
-            elif isinstance(node, ast.ClassDef):
-                self.context.update_class(node)
-                class_def = self.context.build_class_definition(node)
-                self._operations.append(class_def)
-                self._classes[node.name] = []
-                self._common_blocks.append(self.context.build_common_block(node))
-                self._class_nodes.append(node)
-                
+                    self._classes[self.context.cur_class_name].add_method(func)
+                else:
+                    self._funcs.append(func)
+            
             elif isinstance(node, ast.Call):
                 self._opcalls.append(self.context.build_call(node))
-                
+            
             elif isinstance(node, ast.Import):
                 self._imports.update(alias.name for alias in node.names) 
                  
             elif isinstance(node, ast.ImportFrom):
-                self._operations.extend(self.context.build_import_froms(node)) 
+                self._import_froms.extend(self.context.build_import_froms(node)) 
                 
             elif isinstance(node, ast.Assign) or isinstance(node, ast.AnnAssign) or isinstance(node, ast.AugAssign):
-                self._datacalls.extend(self.context.build_datacall(node, parent))
+                self._datacalls.extend(self.context.build_datacalls(node, parent))
 
             for child in ast.iter_child_nodes(node):
                 _walk_search(child, node)
 
-        self.context.update_path(path)
-        self.context.update_modulepath(modulepath)
-        _walk_search(get_ast(path), None)
+        _walk_search(self.context.file.get_ast(), None)

@@ -30,6 +30,11 @@ def dump_default_dict(ddict):
     for el in ddict:
         print(f"{el:<{max_length}} : {ddict[el]!r}")
         
+def dump_dict(dict):
+    for el in dict:
+        print(str(el) + ":\n" + str(dict[el]))
+   
+        
 '''
 Check if ast node is a method
 '''
@@ -88,4 +93,27 @@ def resolve_name_utils(node):
         node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
     if isinstance(node, ast.Name):
         name_parts.append(node.id)          
-    return ".".join(reversed(name_parts))         
+    return ".".join(reversed(name_parts))
+
+'''
+def list_imported_modules(all_imports):
+    imported_modules = []
+    for module_name in all_imports:       
+        try:
+            module = importlib.import_module(module_name)  
+            imported_modules.append(module)             
+        except ModuleNotFoundError:
+            continue  
+    return imported_modules
+                
+def find_method_in_builtin(method_name):
+    builtin_types = [name for name in dir(builtins) if isinstance(getattr(builtins, name), type)]   
+    for t in builtin_types:
+        try:
+            obj = getattr(builtins, t)()
+            if hasattr(obj, method_name):
+                return True
+        except (TypeError, RuntimeError):
+            pass  
+    return False
+'''

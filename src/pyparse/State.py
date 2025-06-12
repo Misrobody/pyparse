@@ -7,4 +7,6 @@ class State:
     NONE = "++none++"
     LAMBDA = "++lambda++"
     EMPTY_COLLECTION = "++empty-collection++"
+    KNOWN = "++known++"
+    FOUND = "++found++"
         

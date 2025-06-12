@@ -1,3 +1,5 @@
+from State import *
+
 class OperationCall:
     def __init__(self, caller, callee):
         self.caller = caller
@@ -17,8 +19,8 @@ class OperationCall:
     def export_not_found(self):
         return (self.caller.path, self.caller.module, self.caller.name, self.callee.name)
     
-    def is_unresolved(self):
-        return self.callee.module == "<unknown>" or self.callee.path == "<unknown>"
-    
-    def root(self):
-        return self.callee.name.split(".")[-1]
+    def update_callee_origin(self, file, module, state=State.FOUND):
+        if self.callee.state != State.FOUND:
+            self.callee.path = file
+            self.callee.module = module
+            self.callee.state = state

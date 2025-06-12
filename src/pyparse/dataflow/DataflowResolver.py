@@ -1,45 +1,49 @@
-import importlib, builtins, sys
-from utils import *
-from generic.Resolver import *
 from State import *
+from ExternalOpsComparator import *
+from dataflow.CommonBlock import *
 
-class DataflowResolver(Resolver):  
-    def __init__(self, dataflow_searcher):
-        super().__init__(dataflow_searcher)
-        self.datacalls = dataflow_searcher.datacalls()
-        self.datacalls_dict = call_dict(self.datacalls)
+class DataflowResolver():  
+    def __init__(self, searcher):
+        self._searcher = searcher
+        self._ext = ExternalOpsComparator(self._searcher.imports)
         
-        self.common_blocks = dataflow_searcher.common_blocks()
-        self.ops_dict = dataflow_searcher.ops()
-                     
-    def resolved_common_blocks(self):
-        return self.common_blocks
+        self._data = set()
+        for call in self._searcher.datacalls:
+            self.data.add(call.caller)
+        self._data = list(self._data)
+        
+        self._common_blocks = []
+        to_parse = list(self._searcher.classes) + self._searcher.files
+        for elem in to_parse:
+            b = CommonBlock(elem.name)
+            b.vars.extend(elem.vars)
+            if not b.empty():
+                self._common_blocks.append(b)
+                      
+    @property             
+    def common_blocks(self):
+        return self._common_blocks
     
-    def resolved_calls(self):
-        return self.datacalls
+    @property
+    def datacalls(self):
+        return self._searcher.datacalls
+    
+    @property
+    def data(self):
+        return self._data
                                                                          
     def resolve_all(self):
-        for call in self.datacalls:
-            if not call.is_unresolved():
-                continue
+        for call in self._searcher.datacalls:
+            call in self._data
+            for b in self._common_blocks:
+                call in b.vars
+            call in self._searcher.funcs
+            call in self._searcher.classes
+            call in self._searcher.import_froms
+            self._ext.resolve_external_call(call)
             
-            if call.callee.name in self.ops_dict:
-                call.set_callee(self.ops_dict[call.callee.name][0])           
-            elif call.callee.root() in self.ops_dict:
-                call.set_callee(self.ops_dict[call.callee.root()][0])                                
-            elif call.callee.name in self.datacalls_dict:
-                call.set_callee(self.datacalls_dict[call.callee.name]) 
-            elif call.callee.root() in self.datacalls_dict:
-                call.set_callee(self.datacalls_dict[call.callee.root()])            
-            elif self._find_method_in_builtin(call.callee.root()):
-                call.callee.module = "builtins"
-                call.callee.path = State.METHOD         
-            else:
-                for m in self.imported_modules:
-                    if hasattr(m, call.callee.root()):
-                        call.callee.module = m.__name__
-                        call.callee.path = State.IMPORTED
-                        break
+            
+            
         
         
         

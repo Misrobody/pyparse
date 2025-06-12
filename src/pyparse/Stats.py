@@ -1,4 +1,5 @@
 from termcolor import colored
+from State import *
 
 class Stats:
     def __init__(self):
@@ -10,11 +11,11 @@ class Stats:
      
     def count_stats(self, calls):
         for call in calls:
-            if call.callee.is_not_found():
+            if call.callee.state == State.UNKNOWN:
                 self.stats["not_found"] += 1
-            elif call.callee.is_from_import():
+            elif call.callee.state == State.IMPORTED:
                 self.stats["import"] += 1
-            elif call.callee.is_from_method():
+            elif call.callee.state == State.METHOD:
                 self.stats["method"] += 1
             else:
                 self.stats["call"] += 1

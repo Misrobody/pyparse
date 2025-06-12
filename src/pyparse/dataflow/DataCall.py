@@ -1,3 +1,5 @@
+from State import *
+
 class DataCall:
     def __init__(self, caller, callee, direction):
         self.caller = caller
@@ -19,10 +21,8 @@ class DataCall:
     def export_not_found(self):
         return (self.caller.path, self.caller.module, self.caller.name, self.callee.name)
     
-    def is_unresolved(self):
-        return self.callee.module == "<unknown>" or self.callee.path == "<unknown>"
-                   
-    def set_callee(self, callee):
-        self.callee.name = callee.name
-        self.callee.module = callee.module
-        self.callee.path = callee.path
+    def update_callee_origin(self, file, module, state=State.FOUND):
+        if self.callee.state != State.FOUND:
+            self.callee.path = file
+            self.callee.module = module
+            self.callee.state = state

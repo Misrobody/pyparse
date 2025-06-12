@@ -15,12 +15,9 @@ class CsvExporter:
             writer.writerow(headers)
             writer.writerows(data)
         
-    def _export_operation_dict(self, ops_dict):
+    def _export_operation(self, ops):
         headers = ["file", "operation"]
-        uncompressed = []
-        for ops in ops_dict.values():
-            for op in ops:
-                uncompressed.append(op.export())
+        uncompressed = [op.export() for op in ops]
         self._export_target(headers, uncompressed, "operation_definitions")
         
     def _export_call_table(self, calls):
@@ -71,13 +68,13 @@ class CsvExporter:
         self._export_target(headers, uncompressed, "dataflow-cb")
               
     def export_calls(self, resolver):
-        self._export_operation_dict(resolver.resolved_ops())      
-        self._export_call_table(resolver.resolved_calls())      
+        self._export_operation(resolver.ops)      
+        self._export_call_table(resolver.opcalls)      
         #self._export_not_found(resolver.resolved_calls())
         
     def export_dataflow(self, resolver):
-        calls = resolver.resolved_calls()
-        blocks = resolver.resolved_common_blocks()
+        calls = resolver.datacalls
+        blocks = resolver.common_blocks
         
         #self._export_operation_dict(resolver.resolved_ops())
         #self._export_not_found(calls)

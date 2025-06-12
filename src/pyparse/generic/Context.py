@@ -8,42 +8,31 @@ from call.OperationCall import *
 
 from State import *
 
+from generic.ClassInfo import *
+
 class Context:
-    def __init__(self):
-        self.filepath = ""    
-        self.class_node = None
-        self.func_node = None     
-        self.common_block = None
+    def __init__(self):   
+        self._class = None
+        self._func = None     
+        self._file = None
+    
+    def update_func(self, funcNode):
+        self._func = funcNode
         
-    def update_path(self, path):
-        self.filepath = path
-        
-    def update_func(self, func):
-        self.func_node = func
+    def update_file(self, fileinfo):
+        self._file = fileinfo
 
-    def update_class(self, class_node):
-        self.class_node = class_node
+    def update_class(self, classInfo):
+        self._class = classInfo
         
-    def update_modulepath(self, modulepath):
-        self.modulepath = modulepath
-
-    def resolve_name(self, node):
-        name_parts = [] 
-        while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
-            if isinstance(node, ast.Attribute):
-                name_parts.append(node.attr)
-            elif isinstance(node, ast.Subscript):
-                name_parts.append(self.resolve_name(node.value))
-            node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
-        if isinstance(node, ast.Name):
-            name_parts.append(node.id)             
-        name = ".".join(reversed(name_parts))          
-        if "self" in name:
-            name = name.replace("self", self.class_node.name)
-        elif "super" in name and self.class_node.bases:
-            name = name.replace("super", self.resolve_name(self.class_node.bases[0]))
-        return name
-                             
+    @property
+    def file(self):
+        return self._file
+    
+    @property
+    def cur_class_name(self):
+        return self._class.name
+                              
     def resolve_datacall_targets(self, datacall):
         if isinstance(datacall, ast.Assign):
             res = []
@@ -120,62 +109,56 @@ class Context:
             return sum([self.resolve_datacall_values(val) for val in node.values], [])
 
         return [node]
-    
-    def resolve_function_name(self, node):
-        if node == None:
-            return State.NONE
-        if is_method(node) or is_static_method(node):
-            return f"{self.class_node.name}.{node.name}"
-        return node.name    
-    
-    def resolve_module_name(self):
-        if self.class_node != None and (is_method(self.func_node) or is_static_method(self.func_node)):
-            return f"{self.modulepath}.{file_name(self.filepath)}.{self.class_node.name}"
-        return f"{self.modulepath}.{file_name(self.filepath)}"
 
-    def build_datacall(self, datacall, parent):
+    def resolve_name(self, node):
+        name_parts = [] 
+        while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
+            if isinstance(node, ast.Attribute):
+                name_parts.append(node.attr)
+            elif isinstance(node, ast.Subscript):
+                name_parts.append(self.resolve_name(node.value))
+            node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
+        if isinstance(node, ast.Name):
+            name_parts.append(node.id)       
+        return ".".join(reversed(name_parts)).split(".")[-1] 
+    
+    #########################################################################################################        
+    
+    def build_datacalls(self, datacall, parent):
         res = []
         values = self.resolve_datacall_values(datacall.value)
         targets = self.resolve_datacall_targets(datacall)
 
         for name in targets:
-            caller = Operation(self.filepath, self.resolve_module_name(), self.resolve_name(name))
+            caller = Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.KNOWN)
             direction = self.resolve_direction(name)
             
-            # Add call to common block if needed
-            if self.common_block:
-                if isinstance(parent, ast.Module):
-                    self.common_block.addCaller(caller, direction)
-                if isinstance(parent, ast.ClassDef) or (isinstance(parent, ast.FunctionDef) and "__init__" in parent.name):
-                    self.common_block.addCaller(caller, direction)
-
+            if isinstance(parent, ast.Module):
+                    self._file.add_global_var(caller)          
+            if isinstance(parent, ast.ClassDef) or (isinstance(parent, ast.FunctionDef) and "__init__" in parent.name):
+                    self._class.add_attr(caller)
+                      
             for val in values:
                 if not isinstance(val, ast.Constant):
-                    callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(val))
+                    callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(val), State.UNKNOWN)
                     res.append(DataCall(caller, callee, direction))
-
-        return res   
+        return res       
     
-    def build_common_block(self, node):
-        name = node.name if isinstance(node, ast.ClassDef) else self.filepath
-        self.common_block = CommonBlock(name)
-        return self.common_block
+    def build_class(self, node):
+        return ClassInfo(self._file.full_path, f"{self._file.module}.{node.name}", node.name, node.bases)
+    
+    def build_func(self, node):
+        return Operation(self._file.full_path, self._file.module, node.name, State.KNOWN)
     
     def build_call(self, call):
-        caller = Operation(self.filepath, self.resolve_module_name(), self.resolve_function_name(self.func_node))
-        callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call))
+        caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
+        callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call), State.UNKNOWN)
         return OperationCall(caller, callee)
-    
-    def build_operation_definition(self, node):
-        return Operation(self.filepath, self.resolve_module_name(), self.resolve_function_name(node))
-    
-    def build_class_definition(self, node):
-        return Operation(self.filepath, self.resolve_module_name(), node.name)
     
     def build_import_froms(self, node):
         res = []
         for alias in node.names:
-            res.append(Operation(State.IMPORTED, node.module, alias.name))
+            res.append(Operation(State.IMPORTED, node.module, alias.name, State.IMPORTED))
             if alias.asname:
-                res.append(Operation(State.IMPORTED, node.module, alias.asname))
+                res.append(Operation(State.IMPORTED, node.module, alias.asname, State.IMPORTED))
         return res

@@ -1,31 +1,30 @@
-import importlib, builtins, sys
-from generic.Resolver import *
 from State import *
+from ExternalOpsComparator import *
 
-class CallResolver(Resolver):  
-    def __init__(self, callsearcher):
-        super().__init__(callsearcher)
-        self.ops_dict = callsearcher.ops()
-        self.calls = callsearcher.opcalls()
+class CallResolver():  
+    def __init__(self, searcher):
+        self._searcher = searcher
+        self._ext = ExternalOpsComparator(self._searcher.imports)
+        
+        self._ops = self._searcher.funcs
+        self._ops.extend(self._searcher.import_froms)
+        for c in self._searcher.classes:
+            self._ops.append(c.as_operation())
+        
+    @property
+    def ops(self):
+        return self._ops
     
-    def resolved_calls(self):
-        return self.calls
+    @property
+    def opcalls(self):
+        return self._searcher.opcalls
                     
     def resolve_all(self):       
-        for opcall in self.calls:
-            if opcall.callee.name in self.ops_dict:
-                opcall.callee = self.ops_dict[opcall.callee.name][0]
-            elif opcall.root() in self.ops_dict:
-                opcall.callee = self.ops_dict[opcall.root()][0]            
-            elif self._find_method_in_builtin(opcall.root()):
-                opcall.callee.module = "builtins"
-                opcall.callee.path = State.METHOD        
-            else:
-                for m in self.imported_modules:
-                    if hasattr(m, opcall.root()):
-                        opcall.callee.module = m.__name__
-                        opcall.callee.path = State.IMPORTED
-                        break
+        for opcall in self._searcher._opcalls:
+            opcall in self._searcher.funcs
+            opcall in self._searcher.classes
+            opcall in self._searcher.import_froms
+            self._ext.resolve_external_call(opcall)
         
         
         
