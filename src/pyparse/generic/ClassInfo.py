@@ -1,5 +1,4 @@
 from call.OperationCall import *
-from dataflow.DataCall import *
 from State import *
 from generic.Operation import *
 
@@ -51,8 +50,8 @@ class ClassInfo:
     
     def __eq__(self, other):
             if isinstance(other, ClassInfo):
-                return self.name == other.name       
-            if isinstance(other, OperationCall) or isinstance(other, DataCall):
+                return self.name == other.name   
+            if isinstance(other, OperationCall):
                 other in self._methods
                 if other.callee.name == self._name:
                     other.update_callee_origin(self._file, self._module, State.CLASS)

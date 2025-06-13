@@ -39,4 +39,4 @@ class FileInfo:
         self._global_vars.append(var)
     
     def __repr__(self):
-        return self._name
+        return "(" + self._modulepath + ", " + self._name + ")"

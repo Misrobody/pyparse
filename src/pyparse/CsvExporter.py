@@ -30,21 +30,23 @@ class CsvExporter:
         uncompressed = [call.export() for call in calls]
         self._export_target(headers, uncompressed, "calltable")
         
-    def _export_not_found(self, calls):
+    def _export_not_found(self, calls, name):
         headers = ["callerfilename",
                 "callermodule",
                 "callerfunction",
                 "calleefunction"]
         uncompressed = [call.export_not_found() for call in calls if call.is_unresolved()]
         uncompressed = list(set(uncompressed))
-        self._export_target(headers, uncompressed, "notfound")
+        self._export_target(headers, uncompressed, "notfound_" + name)
               
     def _export_common_blocks(self, blocks):
         headers = ["name",
                 "files",
                 "modules",
                 "variables"]
-        uncompressed = [block.export() for block in blocks]
+        uncompressed = []
+        for block in blocks:
+            uncompressed.extend(block.export())
         self._export_target(headers, uncompressed, "common-blocks")
               
     def _export_dataflow_cc(self, calls):
@@ -70,14 +72,13 @@ class CsvExporter:
     def export_calls(self, resolver):
         self._export_operation(resolver.ops)      
         self._export_call_table(resolver.opcalls)      
-        #self._export_not_found(resolver.resolved_calls())
+        self._export_not_found(resolver.opcalls, "call")
         
     def export_dataflow(self, resolver):
         calls = resolver.datacalls
         blocks = resolver.common_blocks
-        
-        #self._export_operation_dict(resolver.resolved_ops())
-        #self._export_not_found(calls)
+    
+        self._export_not_found(calls, "dataflow")
         self._export_dataflow_cc(calls)
         self._export_common_blocks(blocks)
         self._export_dataflow_cb(blocks)

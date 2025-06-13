@@ -2,7 +2,6 @@ import ast
 from termcolor import colored
 from State import *
 from call.OperationCall import *
-from dataflow.DataCall import *
 
 class Operation:
     def __init__(self, path, module, name, state):
@@ -40,7 +39,7 @@ class Operation:
     def __eq__(self, other):
             if isinstance(other, Operation):
                 return self.name == other.name and self.path == other.path and self.module == other.module           
-            if isinstance(other, OperationCall) or isinstance(other, DataCall):
+            if isinstance(other, OperationCall):
                 if self.name == other.callee.name:
                     other.update_callee_origin(self.path, self.module, State.FOUND)
             return False

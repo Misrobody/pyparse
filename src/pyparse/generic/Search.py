@@ -58,7 +58,7 @@ class Search:
                 if parent_dir.endswith(current_module):
                     new_module = f"{current_module}/{file_name(dirpath)}"
                 else:
-                    new_module = f"{longest_common_substring(current_module, parent_dir)}/{file_name(dirpath)}"
+                    new_module = f"{longest_common_substring(current_module, parent_dir)}{file_name(dirpath)}"
                 current_module = new_module    
                 
             # parse files                      

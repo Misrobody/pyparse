@@ -1,5 +1,4 @@
 from termcolor import colored
-from dataflow.DataCall import *
 
 class CommonBlock:
     def __init__(self, name):
@@ -21,14 +20,10 @@ class CommonBlock:
         return len(self.vars) == 0
     
     def export(self):
-        vars = []
-        files = []
-        modules = []
+        res = []
         for v in self.vars:
-            vars.append(v.name)
-            files.append(v.path)
-            modules.append(v.module)
-        return (self.name, files.__repr__(), modules.__repr__(), vars.__repr__())
+            res.append((self.name, v.path, v.module, v.name))
+        return res
     
     def export_dataflow_cb(self):
         res = []
