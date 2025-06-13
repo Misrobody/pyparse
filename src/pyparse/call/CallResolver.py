@@ -7,7 +7,10 @@ class CallResolver():
         self._ext = ExternalOpsComparator(self._searcher.imports)
         self._external = external
         
-        self._ops = self._searcher.funcs
+        # Make a list of all the involved operations (funcs + importfroms + classdefs)
+        self._ops = []
+        for f in self._searcher.funcs:
+            self._ops.append(f.as_operation())
         self._ops.extend(self._searcher.import_froms)
         for c in self._searcher.classes:
             self._ops.append(c.as_operation())
@@ -22,7 +25,7 @@ class CallResolver():
                     
     def resolve_all(self):       
         for opcall in self._searcher._opcalls:
-            opcall in self._searcher.funcs
+            opcall in self._searcher._funcs
             opcall in self._searcher.classes
             opcall in self._searcher.import_froms
             if self._external:

@@ -46,6 +46,14 @@ class OperationCall:
                 self.caller.name,
                 self.callee.path,
                 self.callee.module,
+                self.callee.name)
+        
+    def export_with_direction(self):
+        return (self.caller.path, 
+                self.caller.module,
+                self.caller.name,
+                self.callee.path,
+                self.callee.module,
                 self.callee.name,
                 self.direction)
         

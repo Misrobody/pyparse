@@ -33,8 +33,8 @@ class CsvExporter:
     def _export_not_found(self, calls, name):
         headers = ["callerfilename",
                 "callermodule",
-                "callerfunction",
-                "calleefunction"]
+                "caller",
+                "callee"]
         uncompressed = [call.export_not_found() for call in calls if call.is_unresolved()]
         uncompressed = list(set(uncompressed))
         self._export_target(headers, uncompressed, "notfound_" + name)
@@ -57,7 +57,7 @@ class CsvExporter:
                 "target-module",
                 "target-operation",
                 "direction"]
-        uncompressed = [call.export() for call in calls]
+        uncompressed = [call.export_with_direction() for call in calls]
         self._export_target(headers, uncompressed, "dataflow-cc")
     
     def _export_dataflow_cb(self, blocks):
@@ -72,7 +72,7 @@ class CsvExporter:
     def export_calls(self, resolver):
         self._export_operation(resolver.ops)      
         self._export_call_table(resolver.opcalls)      
-        self._export_not_found(resolver.opcalls, "call")
+        self._export_not_found(resolver.opcalls, "calls")
         
     def export_dataflow(self, resolver):
         calls = resolver.datacalls

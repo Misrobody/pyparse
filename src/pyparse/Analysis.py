@@ -18,7 +18,7 @@ class Analysis:
                              
     def run(self):
         self.search.search()
-      
+        
         if self.mode == "call":
             self.call_analysis()
         elif self.mode == "dataflow":
@@ -26,7 +26,7 @@ class Analysis:
         elif self.mode == "both":
             self.call_analysis()
             self.dataflow_analysis()
-                                       
+                                      
     def call_analysis(self):
         resolver = CallResolver(self.search, self.external)
         resolver.resolve_all()

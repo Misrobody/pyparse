@@ -8,7 +8,9 @@ class Stats:
         self.stats["imports"] = 0
         self.stats["methods"] = 0
         self.stats["class_definitions"] = 0
+        self.stats["iter_vars"] = 0
         self.stats["generic"] = 0
+        self.stats["params"] = 0
      
     def count_stats(self, calls):
         for call in calls:
@@ -20,11 +22,15 @@ class Stats:
                 self.stats["methods"] += 1
             elif call.callee.state == State.CLASS:
                 self.stats["class_definitions"] += 1
+            elif call.callee.state == State.ITERVAR:
+                self.stats["iter_vars"] += 1
+            elif call.callee.state == State.PARAM:
+                self.stats["params"] += 1
             else:
                 self.stats["generic"] += 1
                 
         self.stats["total"] = len(calls)
-        self.stats["found"] = self.stats["generic"] + self.stats["imports"] + self.stats["methods"] + self.stats["class_definitions"]
+        self.stats["found"] = self.stats["generic"] + self.stats["imports"] + self.stats["methods"] + self.stats["class_definitions"] + self.stats["iter_vars"] + self.stats["params"]
         
     def _rate(self, key):
             return f"{(self.stats[key] / self.stats['total'] * 100):.2f}%" 
@@ -46,6 +52,8 @@ class Stats:
         
         print("\nInternal Calls Breakdown:")
         print(self._stat("class_definitions"))
+        print(self._stat("iter_vars"))
+        print(self._stat("params"))
         print(self._stat("generic"))
         
         print("\nExternal Calls Breakdown:")

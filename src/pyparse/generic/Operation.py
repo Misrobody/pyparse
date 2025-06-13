@@ -11,10 +11,8 @@ class Operation:
         self.state = state
    
     def __repr__(self):
-        res = f"({self.path}, {self.module}, {self.name})"
-        if self.name == "":
-            color = "magenta"
-        elif self.state == State.UNRESOLVED:
+        res = f"({self.module}, {self.name})"
+        if self.state == State.UNRESOLVED:
             color = "cyan"
         elif self.state == State.UNKNOWN:
             color = "red"
@@ -25,7 +23,11 @@ class Operation:
         elif self.state == State.FOUND:
             color = "green"
         elif self.state == State.CLASS:
-            color = "grey"
+            color = "light_grey"
+        elif self.state == State.ITERVAR:
+            color = "dark_grey"
+        elif self.state == State.PARAM:
+            color = "magenta"
         else:
             color = "white"
         return colored(res, color)

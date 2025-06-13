@@ -1,13 +1,10 @@
 from utils import *
 from generic.Operation import *
-
 from dataflow.CommonBlock import *
-
 from call.OperationCall import *
-
 from State import *
-
 from generic.ClassInfo import *
+from generic.FuncInfo import *
 
 class Context:
     def __init__(self):   
@@ -103,19 +100,28 @@ class Context:
         return [node]
         
     def resolve_name(self, node):
-        def get_name(node):
-            while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
-                if isinstance(node, ast.Attribute):
-                    return node.attr
-                elif isinstance(node, ast.Subscript):
-                    return self.resolve_name(node.value)
-                node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func            
-            return node.id
-        name = get_name(node)
-        if "self" in name:
-            return self._class.name
-        return name
+        while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
+            if isinstance(node, ast.Attribute):
+                return node.attr
+            elif isinstance(node, ast.Subscript):
+                return self.resolve_name(node.value)
+            node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
+        return node.id
     
+    '''
+    def resolve_name(self, node):
+        name_parts = [] 
+        while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
+            if isinstance(node, ast.Attribute):
+                name_parts.append(node.attr)
+            elif isinstance(node, ast.Subscript):
+                name_parts.append(self.resolve_name(node.value))
+            node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
+        if isinstance(node, ast.Name):
+            name_parts.append(node.id)    
+        return name_parts[0]
+    '''
+       
     def build_datacalls(self, datacall, parent):
         res = []
         values = self.resolve_datacall_values(datacall.value)
@@ -131,7 +137,10 @@ class Context:
                       
             for val in values:
                 if not isinstance(val, ast.Constant):
-                    callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(val), State.UNKNOWN)
+                    name = self.resolve_name(val)
+                    if "self" in name:
+                        name = self._class.name
+                    callee = Operation(State.UNKNOWN, State.UNKNOWN, name, State.UNKNOWN)
                     res.append(OperationCall(caller, callee))
         return res       
     
@@ -139,7 +148,10 @@ class Context:
         return ClassInfo(self._file.full_path, f"{self._file.module}.{node.name}", node.name, node.bases)
     
     def build_func(self, node):
-        return Operation(self._file.full_path, self._file.module, node.name, State.KNOWN)
+        return FuncInfo(self._file.full_path, self._file.module, node)
+    
+    def build_iterator_var(self, name):
+        return Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)
     
     def build_call(self, call):
         caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)

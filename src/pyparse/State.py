@@ -6,6 +6,8 @@ class State:
     KNOWN = "++known++"
     FOUND = "++found++"
     CLASS = "++class++"
+    ITERVAR = "++iter-var++"
+    PARAM = "++param++"
     
     NONE = "++none++"
     LAMBDA = "++lambda++"
