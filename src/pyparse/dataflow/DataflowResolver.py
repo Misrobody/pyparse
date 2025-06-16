@@ -1,11 +1,9 @@
 from State import *
-from ExternalOpsComparator import *
 from dataflow.CommonBlock import *
 
 class DataflowResolver():  
-    def __init__(self, searcher, external):
+    def __init__(self, searcher, external=None):
         self._searcher = searcher
-        self._ext = ExternalOpsComparator(self._searcher.imports)
         self._external = external
         
         # Make a list of all the datacalls definitions
@@ -45,7 +43,7 @@ class DataflowResolver():
             call in self._searcher.import_froms
             call in self._searcher.iterator_vars
             if self._external:
-                self._ext.resolve_external_call(call)
+                self._external.resolve_external_call(call)
             
             
             
