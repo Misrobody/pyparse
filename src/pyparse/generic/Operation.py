@@ -11,7 +11,7 @@ class Operation:
         self.state = state
    
     def __repr__(self):
-        res = f"({self.module}, {self.name})"
+        res = f"(STATE: {self.state}, {self.module}, {self.name})"
         if self.state == State.UNKNOWN:
             color = "red"
         elif self.state == State.IMPORTED:
@@ -19,7 +19,7 @@ class Operation:
         elif self.state == State.FOUND:
             color = "green"
         elif self.state == State.CLASS:
-            color = "light_grey"
+            color = "cyan"
         elif self.state == State.ITERVAR:
             color = "dark_grey"
         elif self.state == State.PARAM:

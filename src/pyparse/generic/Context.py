@@ -5,6 +5,7 @@ from call.OperationCall import *
 from State import *
 from generic.ClassInfo import *
 from generic.FuncInfo import *
+import sys
 
 class Context:
     def __init__(self):   
@@ -99,17 +100,6 @@ class Context:
 
         return [node]
         
-    '''
-    def resolve_name(self, node):
-        while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
-            if isinstance(node, ast.Attribute):
-                return node.attr
-            elif isinstance(node, ast.Subscript):
-                return self.resolve_name(node.value)
-            node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
-        return node.id
-    '''
-    
     def resolve_name(self, node):
         name_parts = [] 
         while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
@@ -120,8 +110,8 @@ class Context:
             node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
         if isinstance(node, ast.Name):
             name_parts.append(node.id)   
-        if not name_parts:
-            return State.EMPTY
+        if isinstance(node, ast.ListComp):
+            return State.COMP
         return name_parts[0]
        
     def build_datacalls(self, datacall, parent):
@@ -140,12 +130,16 @@ class Context:
             for val in values:
                 if not isinstance(val, ast.Constant):
                     name = self.resolve_name(val)
-                    #name = val
-                    #if isinstance(val, ast.ListComp):
-                    #    print("HOY")
+                    if name == State.COMP:
+                        continue                 
                     if "self" in name:
                         name = self._class.name
                     callee = Operation(State.UNKNOWN, State.UNKNOWN, name, State.UNKNOWN)
+                    
+                    if name == State.EMPTY:
+                        print(OperationCall(caller, callee))
+                        sys.exit()
+                    
                     res.append(OperationCall(caller, callee))
         return res       
     

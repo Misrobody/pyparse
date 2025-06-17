@@ -20,6 +20,7 @@ class Analysis:
                              
     def run(self):
         self.search.search()
+        
         if self.external:
             self.ext_resolver = ExternalResolver(self.search.imports)
         
@@ -41,7 +42,8 @@ class Analysis:
           
     def dataflow_analysis(self):
         resolver = DataflowResolver(self.search, self.ext_resolver)
-        resolver.resolve_all()      
+        resolver.resolve_all()   
+        #dump_list(resolver.datacalls)   
         stats = Stats()
         stats.count_stats(resolver.datacalls)          
         stats.print_stats("Dataflow")      
