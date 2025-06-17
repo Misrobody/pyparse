@@ -112,6 +112,8 @@ class Context:
             name_parts.append(node.id)   
         if isinstance(node, ast.ListComp):
             return State.COMP
+        if not name_parts:
+            return State.EMPTY
         return name_parts[0]
        
     def build_datacalls(self, datacall, parent):
@@ -136,10 +138,6 @@ class Context:
                         name = self._class.name
                     callee = Operation(State.UNKNOWN, State.UNKNOWN, name, State.UNKNOWN)
                     
-                    if name == State.EMPTY:
-                        print(OperationCall(caller, callee))
-                        sys.exit()
-                    
                     res.append(OperationCall(caller, callee))
         return res       
     
@@ -158,7 +156,11 @@ class Context:
         return [Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)]
     
     def build_call(self, call):
-        caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
+        if self._func == None:
+            caller = Operation(self._file.full_path, self._file.module, "FLIP", State.UNKNOWN)
+            
+        else:
+            caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
         callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call), State.UNKNOWN)
         return OperationCall(caller, callee)
     
