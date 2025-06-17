@@ -17,11 +17,6 @@ class Search:
         self._classes = {}
         self._funcs = []
         self._files = []
-        self._iterator_vars = []
-        
-    @property
-    def iterator_vars(self):
-        return self._iterator_vars
         
     @property
     def opcalls(self):
@@ -102,17 +97,6 @@ class Search:
                 
             elif isinstance(node, ast.Assign) or isinstance(node, ast.AnnAssign) or isinstance(node, ast.AugAssign):
                 self._datacalls.extend(self.context.build_datacalls(node, parent))
-
-            elif isinstance(node, ast.For):
-                if isinstance(node.target, ast.Tuple):
-                    for el in node.target.elts:
-                        if not isinstance(el, ast.Constant):
-                            self._iterator_vars.extend(self.context.build_iterator_var(el))
-                else:
-                    self._iterator_vars.extend(self.context.build_iterator_var(node.target))
-            elif isinstance(node, ast.ListComp):
-                for iter in node.generators: 
-                    self._iterator_vars.extend(self.context.build_iterator_var(iter.target))
                     
             for child in ast.iter_child_nodes(node):
                 _walk_search(child, node)

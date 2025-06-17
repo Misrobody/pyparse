@@ -147,14 +147,6 @@ class Context:
     def build_func(self, node):
         return FuncInfo(self._file.full_path, self._file.module, node)
     
-    def build_iterator_var(self, name):
-        if isinstance(name, ast.Tuple):
-            res = []
-            for el in name.elts:
-                res.append(Operation(self._file.full_path, self._file.module, self.resolve_name(el), State.ITERVAR))
-            return res
-        return [Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)]
-    
     def build_call(self, call):
         if self._func == None:
             caller = Operation(self._file.full_path, self._file.module, "FLIP", State.UNKNOWN)

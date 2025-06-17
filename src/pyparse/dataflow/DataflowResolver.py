@@ -41,7 +41,6 @@ class DataflowResolver():
             call in self._searcher.funcs
             call in self._searcher.classes
             call in self._searcher.import_froms
-            call in self._searcher.iterator_vars
             if self._external:
                 self._external.resolve_external_call(call)
             

@@ -7,7 +7,6 @@ class Stats:
         self.stats["not_found"] = 0
         self.stats["imports"] = 0
         self.stats["class_definitions"] = 0
-        self.stats["iter_vars"] = 0
         self.stats["generic"] = 0
         self.stats["params"] = 0
      
@@ -19,15 +18,13 @@ class Stats:
                 self.stats["imports"] += 1
             elif call.callee.state == State.CLASS:
                 self.stats["class_definitions"] += 1
-            elif call.callee.state == State.ITERVAR:
-                self.stats["iter_vars"] += 1
             elif call.callee.state == State.PARAM:
                 self.stats["params"] += 1
             else:
                 self.stats["generic"] += 1
                 
         self.stats["total"] = len(calls)
-        self.stats["found"] = self.stats["generic"] + self.stats["imports"] + self.stats["class_definitions"] + self.stats["iter_vars"] + self.stats["params"]
+        self.stats["found"] = len(calls) - self.stats["not_found"]
         
     def _rate(self, key):
         if self.stats['total'] == 0:
@@ -50,7 +47,6 @@ class Stats:
         print("=" * 14 + " Breakdown " + "=" * 15)
         print(self._stat("imports"))
         print(self._stat("class_definitions"))
-        print(self._stat("iter_vars"))
         print(self._stat("params"))
         print(self._stat("generic"))
        

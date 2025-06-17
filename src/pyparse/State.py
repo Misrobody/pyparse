@@ -3,7 +3,6 @@ class State:
     FOUND = "++found++"
     CLASS = "++class++"
     PARAM = "++param++"
-    ITERVAR = "++iter-var++"
     IMPORTED = "++imported++"
     
     UNKNOWN = "++unknown-component++"
@@ -12,7 +11,7 @@ class State:
     EMPTY = "++empty++"
     COMP = "++comp++"
     
-    _KNOWN_STATES = [IMPORTED, FOUND, CLASS, PARAM, ITERVAR, IMPORTED]
+    _KNOWN_STATES = [IMPORTED, FOUND, CLASS, PARAM, IMPORTED]
     
     @staticmethod
     def isknown(state):
