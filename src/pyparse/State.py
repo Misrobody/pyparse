@@ -1,15 +1,17 @@
 class State:
-    UNKNOWN = "++unknown-component++"
-    IMPORTED = "++imported++"
-    METHOD = "++imported-method++"
-    UNRESOLVED = "++unresolved++"
     KNOWN = "++known++"
     FOUND = "++found++"
     CLASS = "++class++"
-    ITERVAR = "++iter-var++"
     PARAM = "++param++"
+    ITERVAR = "++iter-var++"
+    IMPORTED = "++imported++"
     
-    NONE = "++none++"
+    UNKNOWN = "++unknown-component++"
     LAMBDA = "++lambda++"
     EMPTY_COLLECTION = "++empty-collection++"
-    EMPTY = ""
+    
+    _KNOWN_STATES = [IMPORTED, FOUND, CLASS, PARAM, ITERVAR, IMPORTED]
+    
+    @staticmethod
+    def isknown(state):
+        return state in _KNOW_STATES

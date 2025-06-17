@@ -89,7 +89,7 @@ class Context:
         if isinstance(node, ast.BinOp):
             return sum([self.resolve_datacall_values(node.left), self.resolve_datacall_values(node.right)], [])
         if isinstance(node, ast.UnaryOp):
-            return sum(self.resolve_datacall_values(node.operand), [])
+            return sum(self.resolve_datacall_values([node.operand]), [])
         if isinstance(node, ast.Compare):
             left_vals = self.resolve_datacall_values(node.left)
             comparators_vals = sum([self.resolve_datacall_values(c) for c in node.comparators], [])

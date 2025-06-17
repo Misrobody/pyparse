@@ -32,12 +32,12 @@ class FuncInfo:
         return Operation(self._file, self._module, self.name, State.KNOWN)
     
     def is_method(self):
-        return self.node.args.args and self.node.args.args[0].arg == "self"
+        return self._node.args.args and self._node.args.args[0].arg == "self"
 
     def is_static_method(self):   
         return any(
             isinstance(decorator, ast.Name) and decorator.id == "staticmethod"
-            for decorator in self.node.decorator_list
+            for decorator in self._node.decorator_list
         )
         
     def __eq__(self, other):

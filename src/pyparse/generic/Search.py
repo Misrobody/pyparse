@@ -86,7 +86,7 @@ class Search:
             elif isinstance(node, ast.FunctionDef):
                 funcInfo = self.context.build_func(node)
                 self.context.update_func(funcInfo)
-                if is_method(node) or is_static_method(node):
+                if funcInfo.is_method() or funcInfo.is_static_method():
                     self._classes[self.context.cur_class_name].add_method(funcInfo)
                 else:
                     self._funcs.append(funcInfo)

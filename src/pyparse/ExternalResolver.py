@@ -25,18 +25,17 @@ class ExternalResolver:
         """Extracts methods from all imported modules."""
         methods = {}
         for module in self._imported:
-            module_methods = []
+            module_methods = set()
             for type_name in dir(module):
                 cls = getattr(module, type_name, None)
                 if isinstance(cls, type):
-                    module_methods.extend(name for name, _ in inspect.getmembers(cls, predicate=inspect.isfunction))
-            methods[module.__name__] = module_methods
+                    module_methods.update(name for name, _ in inspect.getmembers(cls, predicate=inspect.isfunction))
+            module_funcs = set(name for name in dir(module) if hasattr(module, name))   
+            methods[module.__name__] = module_methods | module_funcs
         return methods
               
     def resolve_external_call(self, call):
         """Determines the origin of an external call and updates its state."""
         for module in self._imported:
-            if hasattr(module, call.callee.name):
+            if call.callee.name in self._methods.get(module.__name__, []):
                 call.update_callee_origin(module.__name__, module.__name__, State.IMPORTED)
-            elif call.callee.name in self._methods.get(module.__name__, []):
-                call.update_callee_origin(module.__name__, module.__name__, State.METHOD)
