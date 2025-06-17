@@ -14,4 +14,4 @@ class State:
     
     @staticmethod
     def isknown(state):
-        return state in _KNOW_STATES
+        return state in State._KNOWN_STATES

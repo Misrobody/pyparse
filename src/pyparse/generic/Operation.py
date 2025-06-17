@@ -12,14 +12,10 @@ class Operation:
    
     def __repr__(self):
         res = f"({self.module}, {self.name})"
-        if self.state == State.UNRESOLVED:
-            color = "cyan"
-        elif self.state == State.UNKNOWN:
+        if self.state == State.UNKNOWN:
             color = "red"
         elif self.state == State.IMPORTED:
             color = "yellow"
-        elif self.state == State.METHOD:
-            color = "blue"
         elif self.state == State.FOUND:
             color = "green"
         elif self.state == State.CLASS:
@@ -34,10 +30,7 @@ class Operation:
 
     def export(self):
         return self.module, self.name
-    
-    def root(self):
-        return self.name.split(".")[-1]
-    
+       
     def __eq__(self, other):
             if isinstance(other, Operation):
                 return self.name == other.name and self.path == other.path and self.module == other.module           
@@ -48,4 +41,12 @@ class Operation:
         
     def __hash__(self):
         return hash((self.path, self.module, self.name))
+    
+    def update_origin(self, file, module, state):
+        self.path = file
+        self.module = module
+        self.state = state
+        
+    def is_unresolved(self):
+        return not State.isknown(self.state)
 
