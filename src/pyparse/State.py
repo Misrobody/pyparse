@@ -9,6 +9,7 @@ class State:
     UNKNOWN = "++unknown-component++"
     LAMBDA = "++lambda++"
     EMPTY_COLLECTION = "++empty-collection++"
+    EMPTY = "++empty++"
     
     _KNOWN_STATES = [IMPORTED, FOUND, CLASS, PARAM, ITERVAR, IMPORTED]
     

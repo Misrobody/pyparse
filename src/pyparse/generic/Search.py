@@ -107,12 +107,12 @@ class Search:
                 if isinstance(node.target, ast.Tuple):
                     for el in node.target.elts:
                         if not isinstance(el, ast.Constant):
-                            self._iterator_vars.append(self.context.build_iterator_var(el))
+                            self._iterator_vars.extend(self.context.build_iterator_var(el))
                 else:
-                    self._iterator_vars.append(self.context.build_iterator_var(node.target))
+                    self._iterator_vars.extend(self.context.build_iterator_var(node.target))
             elif isinstance(node, ast.ListComp):
                 for iter in node.generators: 
-                    self._iterator_vars.append(self.context.build_iterator_var(iter.target))
+                    self._iterator_vars.extend(self.context.build_iterator_var(iter.target))
                     
             for child in ast.iter_child_nodes(node):
                 _walk_search(child, node)

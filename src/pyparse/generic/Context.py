@@ -99,6 +99,7 @@ class Context:
 
         return [node]
         
+    '''
     def resolve_name(self, node):
         while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
             if isinstance(node, ast.Attribute):
@@ -107,8 +108,8 @@ class Context:
                 return self.resolve_name(node.value)
             node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
         return node.id
-    
     '''
+    
     def resolve_name(self, node):
         name_parts = [] 
         while isinstance(node, (ast.Attribute, ast.Call, ast.Subscript)):
@@ -118,9 +119,10 @@ class Context:
                 name_parts.append(self.resolve_name(node.value))
             node = node.value if isinstance(node, (ast.Attribute, ast.Subscript)) else node.func    
         if isinstance(node, ast.Name):
-            name_parts.append(node.id)    
+            name_parts.append(node.id)   
+        if not name_parts:
+            return State.EMPTY
         return name_parts[0]
-    '''
        
     def build_datacalls(self, datacall, parent):
         res = []
@@ -138,6 +140,9 @@ class Context:
             for val in values:
                 if not isinstance(val, ast.Constant):
                     name = self.resolve_name(val)
+                    #name = val
+                    #if isinstance(val, ast.ListComp):
+                    #    print("HOY")
                     if "self" in name:
                         name = self._class.name
                     callee = Operation(State.UNKNOWN, State.UNKNOWN, name, State.UNKNOWN)
@@ -151,7 +156,12 @@ class Context:
         return FuncInfo(self._file.full_path, self._file.module, node)
     
     def build_iterator_var(self, name):
-        return Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)
+        if isinstance(name, ast.Tuple):
+            res = []
+            for el in name.elts:
+                res.append(Operation(self._file.full_path, self._file.module, self.resolve_name(el), State.ITERVAR))
+            return res
+        return [Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)]
     
     def build_call(self, call):
         caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
