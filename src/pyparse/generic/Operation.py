@@ -33,10 +33,15 @@ class Operation:
        
     def __eq__(self, other):
             if isinstance(other, Operation):
-                return self.name == other.name and self.path == other.path and self.module == other.module           
+                return self.name == other.name and self.path == other.path and self.module == other.module 
+                      
             if isinstance(other, OperationCall):
-                if self.name == other.callee.name:
-                    other.update_callee_origin(self.path, self.module, State.FOUND)
+                if self.name in other.callee.name:
+                    if self.state == State.ITERVAR:
+                        other.update_callee_origin(self.path, self.module, State.ITERVAR)
+                    else:
+                        other.update_callee_origin(self.path, self.module, State.FOUND)
+                    return True
             return False
         
     def __hash__(self):

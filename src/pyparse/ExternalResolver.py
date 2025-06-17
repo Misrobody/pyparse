@@ -37,5 +37,6 @@ class ExternalResolver:
     def resolve_external_call(self, call):
         """Determines the origin of an external call and updates its state."""
         for module in self._imported:
-            if call.callee.name in self._methods.get(module.__name__, []):
-                call.update_callee_origin(module.__name__, module.__name__, State.IMPORTED)
+            for i in self._methods.get(module.__name__, []):
+                if i in call.callee.name:
+                    call.update_callee_origin(module.__name__, module.__name__, State.IMPORTED)

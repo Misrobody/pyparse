@@ -50,10 +50,11 @@ class ClassInfo:
     
     def __eq__(self, other):
             if isinstance(other, ClassInfo):
-                return self.name == other.name   
+                return self.name == other.name  
+             
             if isinstance(other, OperationCall):
                 other in self._methods
-                if other.callee.name == self._name:
+                if self._name in other.callee.name:
                     other.update_callee_origin(self._file, self._module, State.CLASS)
             return False
         
