@@ -1,4 +1,5 @@
 import os, ast
+from call.OperationCall import *
 
 class FileInfo:
     def __init__(self, path, name, modulepath):
@@ -40,3 +41,10 @@ class FileInfo:
     
     def __repr__(self):
         return "(" + self._modulepath + ", " + self._name + ")"
+    
+    def __eq__(self, other):
+            if isinstance(other, FileInfo):
+                return self._name == other._name and self._path == other._path and self._modulepath == other._modulepath         
+            if isinstance(other, OperationCall):
+                other in self._global_vars               
+            return False

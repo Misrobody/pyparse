@@ -12,11 +12,11 @@ class DataflowResolver():
         self._classes = self._searcher.classes
         self._import_froms = self._searcher.import_froms
         self._iterator_vars = self._searcher.iterator_vars
+        self._files = self._searcher.files
         
         # Make a list of all the datacalls definitions
         self._data = list({call.caller for call in self._datacalls})
-
-        
+       
         # Make list of common blocks based on classes (attr) and files (global_vars)
         self._common_blocks = []
         to_parse = list(self._searcher.classes) + self._searcher.files
@@ -42,13 +42,12 @@ class DataflowResolver():
         for i, call in enumerate(self._datacalls, start=1):
             if self._verbose:
                 print(f"[INFO] [Dataflow] Resolving {i}/{len(self._opcalls)}: {call}")
-            
-            for b in self._common_blocks:
-                call in b.vars
-                
+                           
             if call in self._data:
                 continue
             elif call in self._funcs:
+                continue
+            elif call in self._files:
                 continue
             elif call in self._classes:
                 continue
