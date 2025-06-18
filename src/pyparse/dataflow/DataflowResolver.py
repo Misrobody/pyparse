@@ -19,7 +19,7 @@ class DataflowResolver():
        
         # Make list of common blocks based on classes (attr) and files (global_vars)
         self._common_blocks = []
-        to_parse = list(self._searcher.classes) + self._searcher.files
+        to_parse = list(self._searcher.classes) + list(self._searcher.files)
         for elem in to_parse:
             b = CommonBlock(elem.name)
             b.vars.extend(elem.vars)

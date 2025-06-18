@@ -48,3 +48,6 @@ class FileInfo:
             if isinstance(other, OperationCall):
                 return other in self._global_vars          
             return False
+        
+    def __hash__(self):
+        return hash((self._path, self._modulepath, self._name))

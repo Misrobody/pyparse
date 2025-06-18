@@ -17,7 +17,7 @@ class Search:
 
         self._classes = {}
         self._funcs = []
-        self._files = []
+        self._files = set()
         self._iterator_vars = []
         
     @property
@@ -69,7 +69,7 @@ class Search:
             for file in filenames:              
                 if file.endswith(".py"):
                     fileInfo = FileInfo(dirpath, file, current_module.strip("/").replace("/", "."))
-                    self._files.append(fileInfo)
+                    self._files.add(fileInfo)
                     self.context.update_file(fileInfo)           
                     if self.verbose:
                         print("[INFO] [Search] Parsing " + str(fileInfo.full_path))                  
