@@ -6,21 +6,17 @@ class DataflowResolver():
         self._searcher = searcher
         self._external = external
         self._verbose = verbose
+        self._datacalls = self._searcher.datacalls
         
         # Make a list of all the datacalls definitions
-        self._data = set()
-        for call in self._searcher.datacalls:
-            self.data.add(call.caller)
-        self._data = list(self._data)
+        self._data = list({call.caller for call in self._searcher.datacalls})
         
         # Make list of common blocks based on classes (attr) and files (global_vars)
-        self._common_blocks = []
-        to_parse = list(self._searcher.classes) + self._searcher.files
-        for elem in to_parse:
-            b = CommonBlock(elem.name)
-            b.vars.extend(elem.vars)
-            if not b.empty():
-                self._common_blocks.append(b)
+        self._common_blocks = [
+            CommonBlock(elem.name, vars=elem.vars)
+            for elem in set(self._searcher.classes) | self._searcher.files
+            if elem.vars  # Ensures `CommonBlock` isn't empty
+        ]
                       
     @property             
     def common_blocks(self):
@@ -28,16 +24,16 @@ class DataflowResolver():
     
     @property
     def datacalls(self):
-        return self._searcher.datacalls
+        return self._datacalls
     
     @property
     def data(self):
         return self._data
                                                                          
     def resolve_all(self):
-        for call in self._searcher.datacalls:
+        for i, call in enumerate(self._datacalls, start=1):
             if self._verbose:
-                print("[INFO] [Dataflow] Resolving: " + str(call))
+                print(f"[INFO] [Dataflow] Resolving: {call}")
             
             call in self._data
             for b in self._common_blocks:
@@ -50,12 +46,4 @@ class DataflowResolver():
                 self._external.resolve_external_call(call)
                 
             if self._verbose:
-                print("[INFO] [Call] Resolved "  + str(i) + "/" + str(len(self._searcher._opcalls)) + ": " + str(opcall))    
-            
-            
-            
-            
-        
-        
-        
-    
+                print(f"[INFO] [Dataflow] Resolved {i}/{len(self._datacalls)}: {call}")    

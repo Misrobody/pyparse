@@ -34,71 +34,54 @@ class Context:
         if isinstance(datacall, ast.Assign):
             res = []
             for t in datacall.targets:
-                if isinstance(t, ast.Subscript):
-                    res.append(t.value)  
-                elif isinstance(t, ast.Name):  
-                    res.append(t)  
-                elif isinstance(t, ast.Attribute):  
-                    res.append(t)
-                elif isinstance(t, ast.Tuple):  
-                    res.extend(t.elts)  
-                else:
-                    res.append(t)
+                match t:
+                    case ast.Subscript():
+                        res.append(t.value)
+                    case ast.Tuple():  
+                        res.extend(t.elts)  
+                    case _:
+                        res.append(t)
             return res
         if isinstance(datacall.target, (ast.Subscript, ast.Name, ast.Attribute)):
             return [datacall.target]
         return [State.UNRESOLVED]
   
     def resolve_datacall_values(self, node):
-        # Handle different collection types with variable references
-        if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
-            if not node.elts:
-                return [ast.Constant(State.EMPTY_COLLECTION)]   
-            elements = sum((self.resolve_datacall_values(el) for el in node.elts), [])
-            return elements
-        elif isinstance(node, ast.Dict):
-            if not node.keys:
-                return [ast.Constant(State.EMPTY_COLLECTION)]       
-            keys = sum((self.resolve_datacall_values(key) for key in node.keys), [])
-            values = sum((self.resolve_datacall_values(val) for val in node.values), [])
-            return keys + values
-        
-        # Handle structures by comprehension
-        if isinstance(node, (ast.ListComp, ast.SetComp, ast.GeneratorExp, ast.DictComp)):        
-            return sum([self.resolve_datacall_values(gen.iter) for gen in node.generators], [])
-        
-        # Handle if structures
-        if isinstance(node, ast.IfExp):
-            test_vals = self.resolve_datacall_values(node.test)
-            body_vals = self.resolve_datacall_values(node.body)
-            orelse_vals = self.resolve_datacall_values(node.orelse)
-            return test_vals + body_vals + orelse_vals
-        
-        # Handle f strings
-        if isinstance(node, ast.JoinedStr):
-            return sum([self.resolve_datacall_values(val.value) for val in node.values if isinstance(val, ast.FormattedValue)], [])
-        
-        # Handle lambdas
-        if isinstance(node, ast.Lambda):
-            return [ast.Constant(State.LAMBDA)]
-                
-        # Directly return relevant AST objects
-        if isinstance(node, (ast.Constant, ast.Name, ast.Attribute, ast.Call, ast.Subscript)):
-            return [node]
-        
-        # Handle operations
-        if isinstance(node, ast.BinOp):
-            return sum([self.resolve_datacall_values(node.left), self.resolve_datacall_values(node.right)], [])
-        if isinstance(node, ast.UnaryOp):
-            return sum(self.resolve_datacall_values([node.operand]), [])
-        if isinstance(node, ast.Compare):
-            left_vals = self.resolve_datacall_values(node.left)
-            comparators_vals = sum([self.resolve_datacall_values(c) for c in node.comparators], [])
-            return sum([left_vals + comparators_vals], [])
-        if isinstance(node, ast.BoolOp):
-            return sum([self.resolve_datacall_values(val) for val in node.values], [])
-
-        return [node]
+        match node:
+            case ast.List() | ast.Tuple() | ast.Set():
+                if not node.elts:
+                    return [ast.Constant(State.EMPTY_COLLECTION)]   
+                elements = sum((self.resolve_datacall_values(el) for el in node.elts), [])
+                return elements
+            case ast.Dict():
+                if not node.keys:
+                    return [ast.Constant(State.EMPTY_COLLECTION)]       
+                keys = sum((self.resolve_datacall_values(key) for key in node.keys), [])
+                values = sum((self.resolve_datacall_values(val) for val in node.values), [])
+                return keys + values
+            case ast.ListComp() | ast.SetComp() | ast.GeneratorExp() | ast.DictComp():        
+                return sum([self.resolve_datacall_values(gen.iter) for gen in node.generators], [])
+            case ast.IfExp():
+                test_vals = self.resolve_datacall_values(node.test)
+                body_vals = self.resolve_datacall_values(node.body)
+                orelse_vals = self.resolve_datacall_values(node.orelse)
+                return test_vals + body_vals + orelse_vals        
+            case ast.JoinedStr(): # f strings
+                return sum([self.resolve_datacall_values(val.value) for val in node.values if isinstance(val, ast.FormattedValue)], [])          
+            case ast.Lambda():
+                return [ast.Constant(State.LAMBDA)]
+            case ast.BinOp():
+                return sum([self.resolve_datacall_values(node.left), self.resolve_datacall_values(node.right)], [])
+            case ast.UnaryOp():
+                return sum(self.resolve_datacall_values([node.operand]), [])
+            case ast.Compare():
+                left_vals = self.resolve_datacall_values(node.left)
+                comparators_vals = sum([self.resolve_datacall_values(c) for c in node.comparators], [])
+                return sum([left_vals + comparators_vals], [])
+            case ast.BoolOp():
+                return sum([self.resolve_datacall_values(val) for val in node.values], [])
+            case _:
+                return [node]
         
     def resolve_name(self, node):
         name_parts = [] 

@@ -1,9 +1,9 @@
 from termcolor import colored
 
 class CommonBlock:
-    def __init__(self, name):
+    def __init__(self, name, vars=[]):
         self.name = name
-        self.vars = []
+        self.vars = vars
         
     def addCaller(self, caller, direction):
         self.vars.append((caller, direction))

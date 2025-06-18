@@ -60,3 +60,6 @@ class ClassInfo:
         
     def as_operation(self):
         return Operation(self._file, self._module, self._name, State.KNOWN)
+    
+    def __hash__(self):
+        return hash((self._file, self._module, self._name))
