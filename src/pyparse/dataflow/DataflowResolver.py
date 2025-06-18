@@ -7,11 +7,15 @@ class DataflowResolver():
         self._external = external
         self._verbose = verbose
         
+        self._datacalls = self._searcher.datacalls
+        self._funcs = self._searcher.funcs
+        self._classes = self._searcher.classes
+        self._import_froms = self._searcher.import_froms
+        self._iterator_vars = self._searcher.iterator_vars
+        
         # Make a list of all the datacalls definitions
-        self._data = set()
-        for call in self._searcher.datacalls:
-            self._data.add(call.caller)
-        self._data = list(self._data)
+        self._data = list({call.caller for call in self._datacalls})
+
         
         # Make list of common blocks based on classes (attr) and files (global_vars)
         self._common_blocks = []
@@ -28,25 +32,31 @@ class DataflowResolver():
     
     @property
     def datacalls(self):
-        return self._searcher.datacalls
+        return self._datacalls
     
     @property
     def data(self):
         return self._data
                                                                          
     def resolve_all(self):
-        for i, call in enumerate(self._searcher.datacalls, start=1):
+        for i, call in enumerate(self._datacalls, start=1):
             if self._verbose:
-                print(f"[INFO] [Dataflow] Resolving {i}/{len(self._searcher._opcalls)}: {call}")
+                print(f"[INFO] [Dataflow] Resolving {i}/{len(self._opcalls)}: {call}")
             
-            call in self._data
             for b in self._common_blocks:
                 call in b.vars
-            call in self._searcher.funcs
-            call in self._searcher.classes
-            call in self._searcher.import_froms
-            call in self._searcher.iterator_vars
-            if self._external:
+                
+            if call in self._data:
+                continue
+            elif call in self._funcs:
+                continue
+            elif call in self._classes:
+                continue
+            elif call in self._import_froms:
+                continue
+            elif call in self._iterator_vars:
+                continue
+            elif self._external:
                 self._external.resolve_external_call(call)        
         
         
