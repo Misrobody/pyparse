@@ -9,7 +9,7 @@ class Search:
         self.context = Context()
         self.verbose = verbose
         
-        self._opcalls = []
+        self._opcalls = set()
         self._datacalls = []
 
         self._imports = set()
@@ -94,7 +94,7 @@ class Search:
                     self._funcs.append(funcInfo)
             
             elif isinstance(node, ast.Call):
-                self._opcalls.append(self.context.build_call(node))
+                self._opcalls.add(self.context.build_call(node))
             
             elif isinstance(node, ast.Import):
                 self._imports.update(alias.name for alias in node.names) 
