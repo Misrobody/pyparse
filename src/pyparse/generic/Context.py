@@ -113,7 +113,7 @@ class Context:
         if isinstance(node, ast.ListComp):
             return State.COMP
         if not name_parts:
-            return State.EMPTY
+            return State.EMPTY          
         return ".".join(reversed(name_parts))
        
     def build_datacalls(self, datacall, parent):

@@ -4,9 +4,10 @@ from generic.Context import *
 from generic.FileInfo import *
 
 class Search:
-    def __init__(self, source_dir):
+    def __init__(self, source_dir, verbose):
         self.source_dir = source_dir
         self.context = Context()
+        self.verbose = verbose
         
         self._opcalls = []
         self._datacalls = []
@@ -47,7 +48,6 @@ class Search:
     def files(self):
         return self._files
     
-    # remove root module itself from import_froms ?
     @property
     def import_froms(self):
         return self._import_froms
@@ -70,7 +70,9 @@ class Search:
                 if file.endswith(".py"):
                     fileInfo = FileInfo(dirpath, file, current_module.strip("/").replace("/", "."))
                     self._files.append(fileInfo)
-                    self.context.update_file(fileInfo)
+                    self.context.update_file(fileInfo)           
+                    if self.verbose:
+                        print("[INFO] [Search] Parsing " + str(fileInfo.full_path))                  
                     self._depth_first_search()
                                                                               
     def _depth_first_search(self):

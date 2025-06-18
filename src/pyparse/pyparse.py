@@ -7,7 +7,8 @@ if __name__ == "__main__":
     analysis = Analysis(args.input_dir,
                         args.output_dir,
                         args.mode,
-                        args.external)
+                        args.external,
+                        args.verbose)
     analysis.run()
     
      

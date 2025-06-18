@@ -2,9 +2,10 @@ from State import *
 from dataflow.CommonBlock import *
 
 class DataflowResolver():  
-    def __init__(self, searcher, external=None):
+    def __init__(self, searcher, external=None, verbose=False):
         self._searcher = searcher
         self._external = external
+        self._verbose = verbose
         
         # Make a list of all the datacalls definitions
         self._data = set()
@@ -35,6 +36,9 @@ class DataflowResolver():
                                                                          
     def resolve_all(self):
         for call in self._searcher.datacalls:
+            if self._verbose:
+                print("[INFO] [Dataflow] Resolving: " + str(call))
+            
             call in self._data
             for b in self._common_blocks:
                 call in b.vars
@@ -44,6 +48,9 @@ class DataflowResolver():
             call in self._searcher.iterator_vars
             if self._external:
                 self._external.resolve_external_call(call)
+                
+            if self._verbose:
+                print("[INFO] [Call] Resolved "  + str(i) + "/" + str(len(self._searcher._opcalls)) + ": " + str(opcall))    
             
             
             
