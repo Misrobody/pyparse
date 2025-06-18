@@ -12,14 +12,16 @@ class ExternalResolver:
         self._methods = self._list_external_methods()
       
     def _import_modules(self):
-        """Attempts to import all modules in the predefined list and ignores missing ones."""
-        imported_modules = []
-        for module_name in self._all_imports:
-            try:
-                imported_modules.append(importlib.import_module(module_name))
-            except ModuleNotFoundError:
-                pass
-        return imported_modules
+        """Import all modules in the predefined list, ignoring those that are not found."""
+        return [importlib.import_module(module) for module in self._all_imports if self._safe_import(module)]
+
+    def _safe_import(self, module_name):
+        """Attempt to import a module safely, returning False if not found."""
+        try:
+            importlib.import_module(module_name)
+            return True
+        except ModuleNotFoundError:
+            return False
             
     def _list_external_methods(self):
         """Extracts methods from all imported modules."""
@@ -40,3 +42,4 @@ class ExternalResolver:
             for i in self._methods.get(module.__name__, []):
                 if i in call.callee.name:
                     call.update_callee_origin(module.__name__, module.__name__, State.IMPORTED)
+                    return
