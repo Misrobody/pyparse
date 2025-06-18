@@ -46,6 +46,8 @@ class FuncInfo:
         if isinstance(other, OperationCall):
             if self.name in other.callee.name:
                 other.update_callee_origin(self._file, self._module, State.FOUND)
-            if other.callee.name in self._params:   
-                other.update_callee_origin(self._file, self._module, State.PARAM)           
+                return True
+            elif other.callee.name in self._params:   
+                other.update_callee_origin(self._file, self._module, State.PARAM) 
+                return True          
         return False

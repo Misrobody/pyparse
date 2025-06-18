@@ -46,5 +46,5 @@ class FileInfo:
             if isinstance(other, FileInfo):
                 return self._name == other._name and self._path == other._path and self._modulepath == other._modulepath         
             if isinstance(other, OperationCall):
-                other in self._global_vars               
+                return other in self._global_vars          
             return False

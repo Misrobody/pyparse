@@ -53,9 +53,11 @@ class ClassInfo:
                 return self.name == other.name  
              
             if isinstance(other, OperationCall):
-                other in self._methods
+                if other in self._methods:
+                    return True
                 if self._name in other.callee.name:
                     other.update_callee_origin(self._file, self._module, State.CLASS)
+                    return True
             return False
         
     def as_operation(self):
