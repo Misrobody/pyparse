@@ -34,16 +34,13 @@ class Context:
         if isinstance(datacall, ast.Assign):
             res = []
             for t in datacall.targets:
-                if isinstance(t, ast.Subscript):
-                    res.append(t.value)  
-                elif isinstance(t, ast.Name):  
-                    res.append(t)  
-                elif isinstance(t, ast.Attribute):  
-                    res.append(t)
-                elif isinstance(t, ast.Tuple):  
-                    res.extend(t.elts)  
-                else:
-                    res.append(t)
+                match t:
+                    case ast.Subscript():
+                        res.append(t.value)  
+                    case ast.Tuple():  
+                        res.extend(t.elts)  
+                    case _:
+                        res.append(t)
             return res
         if isinstance(datacall.target, (ast.Subscript, ast.Name, ast.Attribute)):
             return [datacall.target]
@@ -143,8 +140,7 @@ class Context:
     
     def build_call(self, call):
         if self._func == None:
-            caller = Operation(self._file.full_path, self._file.module, "FLIP", State.UNKNOWN)
-            
+            caller = Operation(self._file.full_path, self._file.module, "FLIP", State.UNKNOWN)        
         else:
             caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
         callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call), State.UNKNOWN)
