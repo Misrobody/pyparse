@@ -6,38 +6,37 @@ class CallResolver():
         self._external = external
         self._verbose = verbose
         
-        # Make a list of all the involved operations (funcs + importfroms + classdefs)
-        self._ops = []
-        for f in self._searcher.funcs:
-            self._ops.append(f.as_operation())
-        self._ops.extend(self._searcher.import_froms)
-        for c in self._searcher.classes:
-            self._ops.append(c.as_operation())
+        self._opcalls = self._searcher.opcalls
+        self._funcs = self._searcher.funcs
+        self._classes = self._searcher.classes
+        self._import_froms = self._searcher.import_froms
         
+        # Make a list of all the involved operations (funcs + importfroms + classdefs)
+        self._ops = [f.as_operation() for f in self._funcs] \
+                    + self._import_froms \
+                    + [c.as_operation() for c in self._classes]
+                        
     @property
     def ops(self):
         return self._ops
     
     @property
     def opcalls(self):
-        return self._searcher.opcalls
+        return self._opcalls
                     
     def resolve_all(self):      
-        i = 0 
-        for opcall in self._searcher._opcalls:
-            i += 1
+        for i, opcall in enumerate(self._opcalls, start=1):
             if self._verbose:
-                print("[INFO] [Call] Resolving "  + str(i) + "/" + str(len(self._searcher._opcalls)) + ": " + str(opcall))            
+                print(f"[INFO] [Call] Resolving {i}/{len(self._opcalls)}: {opcall}")            
             
-            opcall in self._searcher._funcs
-            opcall in self._searcher.classes
-            opcall in self._searcher.import_froms
-            if self._external:
-                self._external.resolve_external_call(opcall)
-            
-            if self._verbose:
-                print("[INFO] [Call] Resolved "  + str(i) + "/" + str(len(self._searcher._opcalls)) + ": " + str(opcall))    
-        
+            if opcall in self._funcs:
+                continue
+            elif opcall in self._classes:
+                continue
+            elif opcall in self._import_froms:
+                continue
+            elif self._external:
+                self._external.resolve_external_call(opcall)     
         
         
     
