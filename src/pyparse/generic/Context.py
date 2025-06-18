@@ -1,11 +1,9 @@
-from utils import *
-from generic.Operation import *
-from dataflow.CommonBlock import *
-from call.OperationCall import *
-from State import *
-from generic.ClassInfo import *
-from generic.FuncInfo import *
-import sys
+from generic.Operation import Operation
+from call.OperationCall import OperationCall
+from generic.ClassInfo import ClassInfo
+from generic.FuncInfo import FuncInfo
+from State import State
+import ast
 
 class Context:
     def __init__(self):   
@@ -47,39 +45,31 @@ class Context:
         return [State.UNRESOLVED]
   
     def resolve_datacall_values(self, node):
-        match node: 
+        match node:
+            case ast.List() | ast.Tuple() | ast.Set() if not node.elts:
+                return [ast.Constant(State.EMPTY_COLLECTION)]
             case ast.List() | ast.Tuple() | ast.Set():
-                if not node.elts:
-                    return [ast.Constant(State.EMPTY_COLLECTION)]   
-                elements = sum((self.resolve_datacall_values(el) for el in node.elts), [])
-                return elements
+                return sum((self.resolve_datacall_values(el) for el in node.elts), [])
+            case ast.Dict() if not node.keys:
+                return [ast.Constant(State.EMPTY_COLLECTION)]
             case ast.Dict():
-                if not node.keys:
-                    return [ast.Constant(State.EMPTY_COLLECTION)]       
-                keys = sum((self.resolve_datacall_values(key) for key in node.keys), [])
-                values = sum((self.resolve_datacall_values(val) for val in node.values), [])
-                return keys + values
-            case ast.ListComp() | ast.SetComp() | ast.GeneratorExp() | ast.DictComp():        
-                return sum([self.resolve_datacall_values(gen.iter) for gen in node.generators], [])
+                return sum((self.resolve_datacall_values(k) + self.resolve_datacall_values(v) for k, v in zip(node.keys, node.values)), [])
+            case ast.ListComp() | ast.SetComp() | ast.GeneratorExp() | ast.DictComp():
+                return sum((self.resolve_datacall_values(gen.iter) for gen in node.generators), [])
             case ast.IfExp():
-                test_vals = self.resolve_datacall_values(node.test)
-                body_vals = self.resolve_datacall_values(node.body)
-                orelse_vals = self.resolve_datacall_values(node.orelse)
-                return test_vals + body_vals + orelse_vals
+                return sum((self.resolve_datacall_values(n) for n in (node.test, node.body, node.orelse)), [])
             case ast.JoinedStr():
-                return sum([self.resolve_datacall_values(val.value) for val in node.values if isinstance(val, ast.FormattedValue)], [])
+                return sum((self.resolve_datacall_values(val.value) for val in node.values if isinstance(val, ast.FormattedValue)), [])
             case ast.Lambda():
                 return [ast.Constant(State.LAMBDA)]
             case ast.BinOp():
-                return sum([self.resolve_datacall_values(node.left), self.resolve_datacall_values(node.right)], [])
+                return sum((self.resolve_datacall_values(n) for n in (node.left, node.right)), [])
             case ast.UnaryOp():
-                return sum(self.resolve_datacall_values([node.operand]), [])
+                return self.resolve_datacall_values(node.operand)
             case ast.Compare():
-                left_vals = self.resolve_datacall_values(node.left)
-                comparators_vals = sum([self.resolve_datacall_values(c) for c in node.comparators], [])
-                return sum([left_vals + comparators_vals], [])
+                return sum((self.resolve_datacall_values(n) for n in (node.left, *node.comparators)), [])
             case ast.BoolOp():
-                return sum([self.resolve_datacall_values(val) for val in node.values], [])
+                return sum((self.resolve_datacall_values(val) for val in node.values), [])
             case _:
                 return [node]
         
@@ -140,7 +130,7 @@ class Context:
     
     def build_call(self, call):
         if self._func == None:
-            caller = Operation(self._file.full_path, self._file.module, "FLIP", State.UNKNOWN)        
+            caller = Operation(self._file.full_path, self._file.module, self._file.base_name, State.UNKNOWN)        
         else:
             caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
         callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call), State.UNKNOWN)

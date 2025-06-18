@@ -1,7 +1,6 @@
-import ast
 from termcolor import colored
-from State import *
-from call.OperationCall import *
+from State import State
+from call.OperationCall import OperationCall
 
 class Operation:
     def __init__(self, path, module, name, state):

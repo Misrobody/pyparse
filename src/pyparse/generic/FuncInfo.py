@@ -1,6 +1,7 @@
-from call.OperationCall import *
-from State import *
-from generic.Operation import *
+import ast
+from call.OperationCall import OperationCall
+from State import State
+from generic.Operation import Operation
 
 class FuncInfo:
     def __init__(self, file, module, node):

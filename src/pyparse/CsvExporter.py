@@ -1,5 +1,4 @@
 import csv, sys, os
-from utils import *
 
 class CsvExporter:
     def __init__(self, target_dir):

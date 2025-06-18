@@ -1,7 +1,7 @@
-import os
-from utils import *
-from generic.Context import *
-from generic.FileInfo import *
+import os, ast, sys
+from difflib import SequenceMatcher
+from generic.Context import Context
+from generic.FileInfo import FileInfo
 
 class Search:
     def __init__(self, source_dir, verbose):
@@ -112,3 +112,12 @@ class Search:
                     
         for child in ast.iter_child_nodes(node):
             self._depth_first_search(child, node)
+            
+def file_name(path):
+    base_name = os.path.basename(path)
+    file_name, _ = os.path.splitext(base_name)
+    return file_name
+
+def longest_common_substring(str1: str, str2: str) -> str:
+    match = SequenceMatcher(None, str1, str2).find_longest_match(0, len(str1), 0, len(str2))
+    return str1[match.a: match.a + match.size].strip("/") if match.size > 0 else ""

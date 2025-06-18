@@ -1,6 +1,6 @@
-from call.OperationCall import *
-from State import *
-from generic.Operation import *
+from call.OperationCall import OperationCall
+from State import State
+from generic.Operation import Operation
 
 class ClassInfo:
     def __init__(self, file, module, name, bases):

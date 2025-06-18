@@ -1,5 +1,5 @@
 import importlib, sys, inspect
-from State import *
+from State import State
 
 class ExternalResolver:
     def __init__(self, imports):

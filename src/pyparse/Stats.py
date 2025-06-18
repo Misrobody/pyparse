@@ -1,5 +1,5 @@
 from termcolor import colored
-from State import *
+from State import State
 
 class Stats:
     def __init__(self):

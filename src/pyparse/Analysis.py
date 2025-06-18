@@ -1,12 +1,11 @@
-from utils import *
-from CsvExporter import *
-from Stats import *
+from CsvExporter import CsvExporter
+from Stats import Stats
 
-from generic.Search import *
+from generic.Search import Search
 
-from call.CallResolver import *
-from dataflow.DataflowResolver import *
-from ExternalResolver import *
+from call.CallResolver import CallResolver
+from dataflow.DataflowResolver import DataflowResolver
+from ExternalResolver import ExternalResolver
 
 class Analysis:
     def __init__(self, source_dir, target_dir, mode, external, verbose):

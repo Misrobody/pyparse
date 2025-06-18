@@ -1,5 +1,5 @@
-from CommandArgs import *
-from Analysis import *
+from CommandArgs import CommandArgs
+from Analysis import Analysis
              
 if __name__ == "__main__": 
     args = CommandArgs()  

@@ -1,5 +1,3 @@
-from State import *
-
 class CallResolver():  
     def __init__(self, searcher, external=None, verbose=False):
         self._searcher = searcher
