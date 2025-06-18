@@ -10,7 +10,7 @@ class Search:
         self.verbose = verbose
         
         self._opcalls = set()
-        self._datacalls = []
+        self._datacalls = set()
 
         self._imports = set()
         self._import_froms = []
@@ -103,7 +103,7 @@ class Search:
                 self._import_froms.extend(self.context.build_import_froms(node)) 
                 
             elif isinstance(node, ast.Assign) or isinstance(node, ast.AnnAssign) or isinstance(node, ast.AugAssign):
-                self._datacalls.extend(self.context.build_datacalls(node, parent))
+                self._datacalls.update(self.context.build_datacalls(node, parent))
 
             elif isinstance(node, ast.For):
                 if isinstance(node.target, ast.Tuple):
