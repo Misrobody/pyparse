@@ -38,7 +38,7 @@ class Search:
     
     @property
     def imports(self):
-        return list(self._imports)    
+        return self._imports 
     
     @property
     def classes(self):
