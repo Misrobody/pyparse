@@ -41,7 +41,7 @@ class DataflowResolver():
     def resolve_all(self):
         for i, call in enumerate(self._datacalls, start=1):
             if self._verbose:
-                print(f"[INFO] [Dataflow] Resolving {i}/{len(self._opcalls)}: {call}")
+                print(f"[INFO] [Dataflow] Resolving {i}/{len(self._datacalls)}: {call}")
                            
             if call in self._data:
                 continue

@@ -11,22 +11,16 @@ class Operation:
         self.state = state
    
     def __repr__(self):
-        res = f"(STATE: {self.state}, {self.module}, {self.name})"
-        if self.state == State.UNKNOWN:
-            color = "red"
-        elif self.state == State.IMPORTED:
-            color = "yellow"
-        elif self.state == State.FOUND:
-            color = "green"
-        elif self.state == State.CLASS:
-            color = "cyan"
-        elif self.state == State.ITERVAR:
-            color = "dark_grey"
-        elif self.state == State.PARAM:
-            color = "magenta"
-        else:
-            color = "white"
-        return colored(res, color)
+        color_map = {
+            State.UNKNOWN: "red",
+            State.IMPORTED: "yellow",
+            State.FOUND: "green",
+            State.CLASS: "cyan",
+            State.ITERVAR: "dark_grey",
+            State.PARAM: "magenta"
+        }   
+        color = color_map.get(self.state, "white")
+        return colored(f"(STATE: {self.state}, {self.module}, {self.name})", color)
 
     def export(self):
         return self.module, self.name
