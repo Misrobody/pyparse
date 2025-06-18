@@ -88,32 +88,31 @@ class Context:
         if not name_parts:
             return State.EMPTY          
         return ".".join(reversed(name_parts))
-       
+ 
     def build_datacalls(self, datacall, parent):
-        res = []
         values = self.resolve_datacall_values(datacall.value)
         targets = self.resolve_datacall_targets(datacall)
-
+        res = []
         for name in targets:
             caller = Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.KNOWN)
-            
+
+            # Assign caller to the correct scope
             if isinstance(parent, ast.Module):
-                    self._file.add_global_var(caller)          
-            if isinstance(parent, ast.ClassDef) or (isinstance(parent, ast.FunctionDef) and "__init__" in parent.name):
-                    self._class.add_attr(caller)
-                      
-            for val in values:
-                if not isinstance(val, ast.Constant):
-                    name = self.resolve_name(val)
-                    if name == State.COMP:
-                        continue                 
-                    if "self" in name:
-                        name = self._class.name
-                    callee = Operation(State.UNKNOWN, State.UNKNOWN, name, State.UNKNOWN)
-                    
-                    res.append(OperationCall(caller, callee))
-        return res       
-    
+                self._file.add_global_var(caller)
+            elif isinstance(parent, (ast.ClassDef, ast.FunctionDef)) and "__init__" in getattr(parent, "name", ""):
+                self._class.add_attr(caller)
+
+            # Process values
+            for val in filter(lambda v: not isinstance(v, ast.Constant), values):
+                resolved_name = self.resolve_name(val)
+                if resolved_name == State.COMP:
+                    continue
+                if "self" in resolved_name:
+                    resolved_name = self._class.name
+                callee = Operation(State.UNKNOWN, State.UNKNOWN, resolved_name, State.UNKNOWN)
+                res.append(OperationCall(caller, callee))
+        return res
+  
     def build_class(self, node):
         return ClassInfo(self._file.full_path, f"{self._file.module}.{node.name}", node.name, node.bases)
     
@@ -122,24 +121,26 @@ class Context:
     
     def build_iterator_var(self, name):
         if isinstance(name, ast.Tuple):
-            res = []
-            for el in name.elts:
-                res.append(Operation(self._file.full_path, self._file.module, self.resolve_name(el), State.ITERVAR))
-            return res
+            return [Operation(self._file.full_path, self._file.module, self.resolve_name(el), State.ITERVAR) for el in name.elts]  
         return [Operation(self._file.full_path, self._file.module, self.resolve_name(name), State.ITERVAR)]
     
-    def build_call(self, call):
-        if self._func == None:
-            caller = Operation(self._file.full_path, self._file.module, self._file.base_name, State.UNKNOWN)        
-        else:
-            caller = Operation(self._file.full_path, self._file.module, self._func.name, State.KNOWN)
-        callee = Operation(State.UNKNOWN, State.UNKNOWN, self.resolve_name(call), State.UNKNOWN)
+    def build_call(self, node):
+        caller = Operation(
+            self._file.full_path,
+            self._file.module,
+            self._file.base_name if self._func is None else self._func.name,
+            State.UNKNOWN if self._func is None else State.KNOWN
+        )
+        callee = Operation(
+            State.UNKNOWN,
+            State.UNKNOWN,
+            self.resolve_name(node),
+            State.UNKNOWN
+        )
         return OperationCall(caller, callee)
     
     def build_import_froms(self, node):
-        res = []
-        for alias in node.names:
-            res.append(Operation(State.IMPORTED, node.module, alias.name, State.IMPORTED))
-            if alias.asname:
-                res.append(Operation(State.IMPORTED, node.module, alias.asname, State.IMPORTED))
-        return res
+        return [Operation(State.IMPORTED, node.module, alias.name, State.IMPORTED)
+               for alias in node.names] + \
+            [Operation(State.IMPORTED, node.module, alias.asname, State.IMPORTED)
+            for alias in node.names if alias.asname]
