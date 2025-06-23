@@ -72,7 +72,7 @@ class Search:
                     self._files.add(fileInfo)
                     self.context.update_file(fileInfo)           
                     if self.verbose:
-                        print("[INFO] [Search] Parsing " + str(fileInfo.full_path))                  
+                        print("[INFO] [Search] Parsing " + str(fileInfo))               
                     self._depth_first_search(self.context.file.get_ast())
                                                                               
     def _depth_first_search(self, node, parent=None):

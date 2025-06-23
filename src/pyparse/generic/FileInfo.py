@@ -6,7 +6,7 @@ class FileInfo:
         self._path = path
         self._name = name
         self._modulepath = modulepath
-        self._module = f"{self._modulepath}.{self.base_name}"
+        self._module = f"{self._modulepath}.{self.base_name}".strip(".")
         self._global_vars = []
  
     @property
@@ -40,7 +40,7 @@ class FileInfo:
         self._global_vars.append(var)
     
     def __repr__(self):
-        return "(" + self._modulepath + ", " + self._name + ")"
+        return "(" + self._module + ", " + self._name + ")"
     
     def __eq__(self, other):
             if isinstance(other, FileInfo):
