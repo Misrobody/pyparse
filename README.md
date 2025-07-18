@@ -5,3 +5,7 @@ A static Python code parser compatible with the Kieker SAR (Static Architecture 
 
 ## Author
 Daphné Larrivain <daphne.larrivain@ecole.ensicaen.fr>
+
+## Misc.
+
+Use --help to get more information.
