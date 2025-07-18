@@ -8,4 +8,4 @@ Daphné Larrivain <daphne.larrivain@ecole.ensicaen.fr>
 
 ## Misc.
 
-Use --help to get more information.
+Use `--help` to get more information.
